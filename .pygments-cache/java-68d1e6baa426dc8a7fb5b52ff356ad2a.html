@@ -1,0 +1,22 @@
+<div class="highlight"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">FactoryMakerSingleton</span> <span class="o">{</span>
+    
+    <span class="kd">private</span> <span class="kd">static</span> <span class="n">FactoryMakerSingleton</span> <span class="n">instance</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="n">AbstractFactory</span> <span class="n">factory</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="nf">FactoryMakerSingleton</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">factory</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HelloWorldFactory</span><span class="o">();</span>
+    <span class="o">}</span>
+    
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">synchronized</span> <span class="n">FactoryMakerSingleton</span> <span class="nf">getInstance</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">instance</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">instance</span> <span class="o">=</span> <span class="k">new</span> <span class="n">FactoryMakerSingleton</span><span class="o">();</span>
+        <span class="o">}</span>
+        
+        <span class="k">return</span> <span class="n">instance</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="n">AbstractFactory</span> <span class="nf">getFactory</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">factory</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>

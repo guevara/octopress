@@ -1,0 +1,11 @@
+<div class="highlight"><pre><span class="kt">void</span> <span class="nf">VectorNormalizeFast</span><span class="p">(</span> <span class="n">vec3_t</span> <span class="n">v</span> <span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">float</span> <span class="n">ilength</span><span class="p">;</span>
+
+    <span class="n">ilength</span> <span class="o">=</span> <span class="n">Q_rsqrt</span><span class="p">(</span> <span class="n">DotProduct</span><span class="p">(</span> <span class="n">v</span><span class="p">,</span> <span class="n">v</span> <span class="p">)</span> <span class="p">);</span>
+
+    <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*=</span> <span class="n">ilength</span><span class="p">;</span>
+    <span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*=</span> <span class="n">ilength</span><span class="p">;</span>
+    <span class="n">v</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*=</span> <span class="n">ilength</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>

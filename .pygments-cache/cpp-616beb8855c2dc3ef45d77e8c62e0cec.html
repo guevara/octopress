@@ -1,0 +1,16 @@
+<div class="highlight"><pre><span class="cp">#include &lt;stdio.h&gt;</span>
+
+
+<span class="kt">int</span> <span class="n">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="kt">char</span> <span class="n">str</span><span class="p">[]</span> <span class="o">=</span> <span class="s">&quot;skcoR++C&quot;</span><span class="p">;</span>
+    <span class="cm">/*</span>
+<span class="cm">    union{</span>
+<span class="cm">        double f;</span>
+<span class="cm">        char str[8 + 1];</span>
+<span class="cm">    }tmp;</span>
+<span class="cm">    strcpy(tmp.str, str); </span>
+<span class="cm">     */</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;%f&quot;</span><span class="p">,</span> <span class="o">*</span><span class="p">(</span><span class="kt">double</span><span class="o">*</span><span class="p">)</span><span class="n">str</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>

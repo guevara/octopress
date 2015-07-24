@@ -1,0 +1,2459 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>一位有匠心的手艺人</title>
+  <meta name="author" content="bingo">
+
+  
+  <meta name="description" content="摘要 本文揭示了《雷神之锤&#8546;：竞技场》中的一段快速平方根倒数算法和魔法常数的可能值。算法使用一些bit hack技巧快速计算得32位浮点数的平方根倒数的近似值。 玄之又玄，众妙之门 \frac{1}{\sqrt{x}} \tag{*} &#8258; Quake III: Arena &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://guevara.github.io">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  
+  <link href="/atom.xml" rel="alternate" title="一位有匠心的手艺人" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+<!-- mathjax config similar to math.stackexchange -->
+
+<!--
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+-->
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+      processEscapes: true
+    }
+});
+</script>
+
+
+
+<script type="text/javascript"
+   src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-50645712-1']);
+    _gaq.push(['_setDomainName', 'github.io']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">一位有匠心的手艺人</a></h1>
+  
+    <h2>和他的生活方式</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss email">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+    <li><a href="bingo.chern@gmail.com" rel="subscribe-email" title="subscribe via email">Email</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:guevara.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">博客</a></li>
+  <li><a href="/blog/archives">归档</a></li>
+  <li><a href="/about">关于</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/07/14/fast-inverse-square-root/">快速平方根倒数算法</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+
+<time datetime="2014-07-14T19:27:00+08:00" pubdate data-updated="true">Jul 14<span>th</span>, 2014</time>
+        
+         | <a href="/blog/2014/07/14/fast-inverse-square-root/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><div class="note info">
+  <h5>摘要</h5>
+  <p>本文揭示了《雷神之锤&#8546;：竞技场》中的一段快速平方根倒数算法和魔法常数的可能值。算法使用一些bit hack技巧快速计算得32位浮点数的平方根倒数的近似值。</p>
+</div>
+
+<blockquote><p>玄之又玄，众妙之门</p></blockquote>
+
+<script type="math/tex; mode=display">
+    \frac{1}{\sqrt{x}} \tag{*}
+</script>
+
+<center>&#8258;</center>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>Quake III: Arena q_math.c</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+</pre></td><td class="code"><pre><code class="c"><span class="line"><span class="kt">float</span> <span class="nf">Q_rsqrt</span><span class="p">(</span> <span class="kt">float</span> <span class="n">number</span> <span class="p">)</span>
+</span><span class="line"><span class="p">{</span>
+</span><span class="line">    <span class="kt">long</span> <span class="n">i</span><span class="p">;</span>
+</span><span class="line">    <span class="kt">float</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y</span><span class="p">;</span>
+</span><span class="line">    <span class="k">const</span> <span class="kt">float</span> <span class="n">threehalfs</span> <span class="o">=</span> <span class="mf">1.5F</span><span class="p">;</span>
+</span><span class="line">
+</span><span class="line">    <span class="n">x2</span> <span class="o">=</span> <span class="n">number</span> <span class="o">*</span> <span class="mf">0.5F</span><span class="p">;</span>
+</span><span class="line">    <span class="n">y</span>  <span class="o">=</span> <span class="n">number</span><span class="p">;</span>
+</span><span class="line">    <span class="n">i</span>  <span class="o">=</span> <span class="o">*</span> <span class="p">(</span> <span class="kt">long</span> <span class="o">*</span> <span class="p">)</span> <span class="o">&amp;</span><span class="n">y</span><span class="p">;</span>                       <span class="c1">// evil floating point bit level hacking</span>
+</span><span class="line">    <span class="n">i</span>  <span class="o">=</span> <span class="mh">0x5f3759df</span> <span class="o">-</span> <span class="p">(</span> <span class="n">i</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span> <span class="p">);</span>               <span class="c1">// what the fuck?</span>
+</span><span class="line">    <span class="n">y</span>  <span class="o">=</span> <span class="o">*</span> <span class="p">(</span> <span class="kt">float</span> <span class="o">*</span> <span class="p">)</span> <span class="o">&amp;</span><span class="n">i</span><span class="p">;</span>
+</span><span class="line">    <span class="n">y</span>  <span class="o">=</span> <span class="n">y</span> <span class="o">*</span> <span class="p">(</span> <span class="n">threehalfs</span> <span class="o">-</span> <span class="p">(</span> <span class="n">x2</span> <span class="o">*</span> <span class="n">y</span> <span class="o">*</span> <span class="n">y</span> <span class="p">)</span> <span class="p">);</span>   <span class="c1">// 1st iteration</span>
+</span><span class="line"><span class="c1">//  y  = y * ( threehalfs - ( x2 * y * y ) );   // 2nd iteration, this can be removed</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">return</span> <span class="n">y</span><span class="p">;</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>这段朴素又平凡的代码出现《雷神之锤Ⅲ：竞技场》源码<code>quake3-1.32b/code/game/q_math.c</code>的548~572行，
+既不包含循环迭代，也没有除法运算，只涉及简单的浮点数和整数运算。 代码的41~43行分别预告本文的三个小节</p>
+
+<ul>
+  <li>初值确定与误差分析</li>
+  <li>浮点数的表示及运算</li>
+  <li>牛顿逼近</li>
+</ul>
+
+<center>&#8258;</center>
+
+<h4 id="section">1. 起源</h4>
+
+<p>浮点数平方根倒数常用于矢量正规化（标准化）。正规化矢量，先计算其欧氏范数即矢量长度</p>
+
+<script type="math/tex; mode=display">
+\|\boldsymbol{v}\| = \sqrt{v_{i}^2+v_{j}^2+v_{k}^2}
+</script>
+
+<p>作为分母除诸分量即得到与原矢量同方向的 <strong>单位矢量</strong> ，</p>
+
+<script type="math/tex; mode=display">
+\boldsymbol{\hat{v}} = \frac{\boldsymbol{v}} {\|\boldsymbol{v}\|}
+</script>
+
+<p>可见浮点数平方根倒数为矢量正规化必要过程。三维图形程序利用正规化矢量来实现光照和投影效果，每秒会进行百万次平方根倒数运算。
+为了加速图像处理单元计算，《雷神之锤Ⅲ：竞技场》采用了平方根倒数速算法来实现，</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>q_math.c</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+</pre></td><td class="code"><pre><code class="c"><span class="line"><span class="kt">void</span> <span class="nf">VectorNormalizeFast</span><span class="p">(</span> <span class="n">vec3_t</span> <span class="n">v</span> <span class="p">)</span>
+</span><span class="line"><span class="p">{</span>
+</span><span class="line">    <span class="kt">float</span> <span class="n">ilength</span><span class="p">;</span>
+</span><span class="line">
+</span><span class="line">    <span class="n">ilength</span> <span class="o">=</span> <span class="n">Q_rsqrt</span><span class="p">(</span> <span class="n">DotProduct</span><span class="p">(</span> <span class="n">v</span><span class="p">,</span> <span class="n">v</span> <span class="p">)</span> <span class="p">);</span>
+</span><span class="line">
+</span><span class="line">    <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*=</span> <span class="n">ilength</span><span class="p">;</span>
+</span><span class="line">    <span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*=</span> <span class="n">ilength</span><span class="p">;</span>
+</span><span class="line">    <span class="n">v</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*=</span> <span class="n">ilength</span><span class="p">;</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>后来现场可编程逻辑门阵列的顶点着色器也应用了此算法。</p>
+
+<h4 id="section-1">2. 分析</h4>
+
+<h5 id="c">2.1 四行C++整蛊代码背后的秘密</h5>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>C++Sucks</span><a href="http://ideone.com/PM4qan">C++Sucks </a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+</pre></td><td class="code"><pre><code class="cpp"><span class="line"><span class="cp">#include &lt;stdio.h&gt;</span>
+</span><span class="line"><span class="kt">double</span> <span class="n">m</span><span class="p">[]</span><span class="o">=</span> <span class="p">{</span><span class="mf">7709179928849219.0</span><span class="p">,</span> <span class="mi">771</span><span class="p">};</span>
+</span><span class="line"><span class="kt">int</span> <span class="n">main</span><span class="p">()</span>
+</span><span class="line"><span class="p">{</span>
+</span><span class="line">    <span class="n">m</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">--?</span><span class="n">m</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*=</span><span class="mi">2</span><span class="p">,</span><span class="n">main</span><span class="p">()</span><span class="o">:</span><span class="n">printf</span><span class="p">((</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">m</span><span class="p">);</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+<p>运行输出<code>C++Sucks</code>。</p>
+
+<p>将代码格式化为可读版本</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+</pre></td><td class="code"><pre><code class="cpp"><span class="line"><span class="kt">double</span> <span class="n">m</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mf">7709179928849219.0</span><span class="p">,</span> <span class="mi">771</span><span class="p">};</span>
+</span><span class="line"><span class="c1">// m[0] = 7709179928849219.0;</span>
+</span><span class="line"><span class="c1">// m[1] = 771;</span>
+</span><span class="line">
+</span><span class="line"><span class="kt">int</span> <span class="n">main</span><span class="p">()</span>
+</span><span class="line"><span class="p">{</span>
+</span><span class="line">    <span class="k">if</span> <span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">--</span><span class="p">)</span>
+</span><span class="line">    <span class="p">{</span>
+</span><span class="line">        <span class="n">m</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*=</span> <span class="mi">2</span><span class="p">;</span>
+</span><span class="line">        <span class="n">main</span><span class="p">();</span>
+</span><span class="line">    <span class="p">}</span>
+</span><span class="line">    <span class="k">else</span>
+</span><span class="line">    <span class="p">{</span>
+</span><span class="line">        <span class="n">printf</span><span class="p">((</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span> <span class="n">m</span><span class="p">);</span>
+</span><span class="line">    <span class="p">}</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p><code>main()</code>函数递归调用自身771次。开始<code>m[0] = 7709179928849219.0</code>对应字符串<code>C++Suc;C</code>，<code>m[0]</code>每调用一轮即翻一倍，改变末尾两个字符（二进制的指数部分）。
+直到最后一轮调用，<code>m[0]</code>包含<code>C++Sucks</code>的ASCII字符串，而<code>m[1]</code>只包含0。消除递归重构程序主体为循环语句，使代码逻辑更清晰了然：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+</pre></td><td class="code"><pre><code class="cpp"><span class="line"><span class="kt">double</span> <span class="n">m</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span><span class="mf">7709179928849219.0</span><span class="p">,</span> <span class="mi">0</span><span class="p">};</span>
+</span><span class="line"><span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">771</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+</span><span class="line"><span class="p">{</span>
+</span><span class="line">    <span class="n">m</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*=</span> <span class="mi">2</span><span class="p">;</span>
+</span><span class="line"><span class="p">}</span>
+</span><span class="line"><span class="n">printf</span><span class="p">((</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span> <span class="n">m</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>最终代码将浮点数按位解释为字符串，并打印输出。</p>
+
+<h5 id="section-2">2.1.1 浮点数的内部表示</h5>
+
+<p>浮点数IEEE754的标准格式</p>
+
+<table>
+    <tbody>
+        <tr>
+            <th><small>S(ign,符号)</small></th>
+            <th><small>E(xponent,指数)</small></th>
+            <th><small>M(antissa,尾数)</small></th>
+        </tr>
+        <tr style="text-align:center;">
+            <td>1 bit</td>
+            <td>b bits</td>
+            <td><tt>(n-1-b)</tt>bits</td>
+        </tr>
+        <tr>
+            <td colspan="3" style="text-align:center;">n bits</td>
+        </tr>
+    </tbody>
+</table>
+
+<ul>
+  <li>S 尾数符号，0正1负</li>
+  <li>M 尾数, 纯小数的原码表示</li>
+  <li>E 指数（阶码），采用“移码”表示（移码可表示阶符） </li>
+</ul>
+
+<h5 id="section-3">2.1.2 浮点数的规格化</h5>
+
+<ul>
+  <li>隐藏位</li>
+</ul>
+
+<p>原码非0值浮点数的尾数数值最高位必为1，通过尾数移位强行去掉该位，则同样多的位数能多保存一位，从而提高数值精度。</p>
+
+<p>同样，还原浮点数时，必须先恢复该隐藏位。</p>
+
+<ul>
+  <li>移码</li>
+</ul>
+
+<p>对于64位双精度浮点数<code>7709179928849219.0</code>，先将整数和分数部分转换成二进制</p>
+<pre>
+7709179928849219.0 
+= 00011011 01100011 01110101 01010011 00101011 00101011 01000011.0
+      ---- -------- -------- -------- -------- -------- --------
+</pre>
+
+<p>小数点向左移动52位即</p>
+<pre>
+1.1011 01100011 01110101 01010011 00101011 00101011 01000011 * 2^52
+</pre>
+<p><script type="math/tex">e = 52</script>，<script type="math/tex">E = 2^{10} -1 + 52 = 2^{10} + 51 = 10000110011</script>，得到二进制形式：</p>
+<pre>
+01000011 00111011 01100011 01110101 01010011 00101011 00101011 01000011
++^^^^^^^ ^^^^---- -------- -------- -------- -------- -------- --------
+</pre>
+
+<p><code>+</code>为符号位，<code>^</code>部分代表指数，<code>-</code>部分代表尾数(去掉指数剩下的值)。
+对于指数和尾数二进制表示，数值翻倍意味着指数自增一。程序执行<code>771</code>次，指数从<code>1075</code>开始（<code>10000110011</code>的十进制表示）累加至<code>1075 + 771 = 1846</code>终止。<code>1846</code>的二进制表示是<code>11100110110</code>，生成模式串：</p>
+
+<pre>
+01110011 01101011 01100011 01110101 01010011 00101011 00101011 01000011
+-------- -------- -------- -------- -------- -------- -------- --------
+0x73 's' 0x6B 'k' 0x63 'c' 0x75 'u' 0x53 'S' 0x2B '+' 0x2B '+' 0x43 'C'
+</pre>
+
+<p>在<strong>小端模式</strong>下模式串与打印输出一一对应，只不过顺序相反。数组的第二个元素同时递减至零即终止符<code>\0</code>，与第一个元素构成完整字符串传给<code>printf</code>。</p>
+
+<p>上述代码与平台有关，并利用了以下未定义的事实：</p>
+
+<ul>
+  <li>字符串长8字节，恰好为双精度浮点数机器字长</li>
+  <li>字节序（端序）</li>
+</ul>
+
+<h5 id="bit-hack">题外: bit hack</h5>
+
+<p>按位（bitwise）解释</p>
+
+<ul>
+  <li>减少循环（比较）次数</li>
+  <li>增加单位操作量</li>
+  <li>有效利用内存对齐原则，减少访问时钟周期</li>
+</ul>
+
+<h6 id="memcpy">例一. memcpy优化</h6>
+
+<p>glibc</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>memcpy</span><a href="http://code.metager.de/source/xref/gnu/glibc/string/memcpy.c">link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+<span class="line-number">33</span>
+<span class="line-number">34</span>
+<span class="line-number">35</span>
+<span class="line-number">36</span>
+<span class="line-number">37</span>
+<span class="line-number">38</span>
+<span class="line-number">39</span>
+<span class="line-number">40</span>
+<span class="line-number">41</span>
+<span class="line-number">42</span>
+<span class="line-number">43</span>
+<span class="line-number">44</span>
+<span class="line-number">45</span>
+<span class="line-number">46</span>
+<span class="line-number">47</span>
+<span class="line-number">48</span>
+</pre></td><td class="code"><pre><code class="c"><span class="line"><span class="cp">#define BYTE_COPY_FWD(dst_bp, src_bp, nbytes)      </span>
+</span><span class="line"><span class="k">do</span>                                        \
+</span><span class="line">    <span class="p">{</span>                                         \
+</span><span class="line">      <span class="k">if</span> <span class="p">(</span><span class="n">src_bp</span> <span class="o">%</span> <span class="n">OPSIZ</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>                            \
+</span><span class="line">    <span class="n">_wordcopy_fwd_aligned</span> <span class="p">(</span><span class="n">dst_bp</span><span class="p">,</span> <span class="n">src_bp</span><span class="p">,</span> <span class="p">(</span><span class="n">nbytes</span><span class="p">)</span> <span class="o">/</span> <span class="n">OPSIZ</span><span class="p">);</span>        \
+</span><span class="line">      <span class="k">else</span>                                    \
+</span><span class="line">    <span class="n">_wordcopy_fwd_dest_aligned</span> <span class="p">(</span><span class="n">dst_bp</span><span class="p">,</span> <span class="n">src_bp</span><span class="p">,</span> <span class="p">(</span><span class="n">nbytes</span><span class="p">)</span> <span class="o">/</span> <span class="n">OPSIZ</span><span class="p">);</span>       \
+</span><span class="line">      <span class="n">src_bp</span> <span class="o">+=</span> <span class="p">(</span><span class="n">nbytes</span><span class="p">)</span> <span class="o">&amp;</span> <span class="o">-</span><span class="n">OPSIZ</span><span class="p">;</span>                        \
+</span><span class="line">      <span class="n">dst_bp</span> <span class="o">+=</span> <span class="p">(</span><span class="n">nbytes</span><span class="p">)</span> <span class="o">&amp;</span> <span class="o">-</span><span class="n">OPSIZ</span><span class="p">;</span>                        \
+</span><span class="line">      <span class="p">(</span><span class="n">nbytes_left</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="n">nbytes</span><span class="p">)</span> <span class="o">%</span> <span class="n">OPSIZ</span><span class="p">;</span>                       \
+</span><span class="line">    <span class="p">}</span> <span class="k">while</span> <span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</span><span class="line"><span class="kt">void</span> <span class="o">*</span>
+</span><span class="line"><span class="n">memcpy</span> <span class="p">(</span><span class="n">dstpp</span><span class="p">,</span> <span class="n">srcpp</span><span class="p">,</span> <span class="n">len</span><span class="p">)</span>
+</span><span class="line">     <span class="kt">void</span> <span class="o">*</span><span class="n">dstpp</span><span class="p">;</span>
+</span><span class="line">     <span class="k">const</span> <span class="kt">void</span> <span class="o">*</span><span class="n">srcpp</span><span class="p">;</span>
+</span><span class="line">     <span class="kt">size_t</span> <span class="n">len</span><span class="p">;</span>
+</span><span class="line"><span class="p">{</span>
+</span><span class="line">  <span class="kt">unsigned</span> <span class="kt">long</span> <span class="kt">int</span> <span class="n">dstp</span> <span class="o">=</span> <span class="p">(</span><span class="kt">long</span> <span class="kt">int</span><span class="p">)</span> <span class="n">dstpp</span><span class="p">;</span>
+</span><span class="line">  <span class="kt">unsigned</span> <span class="kt">long</span> <span class="kt">int</span> <span class="n">srcp</span> <span class="o">=</span> <span class="p">(</span><span class="kt">long</span> <span class="kt">int</span><span class="p">)</span> <span class="n">srcpp</span><span class="p">;</span>
+</span><span class="line">
+</span><span class="line">  <span class="cm">/* Copy from the beginning to the end.  */</span>
+</span><span class="line">
+</span><span class="line">  <span class="cm">/* If there not too few bytes to copy, use word copy.  */</span>
+</span><span class="line">  <span class="k">if</span> <span class="p">(</span><span class="n">len</span> <span class="o">&gt;=</span> <span class="n">OP_T_THRES</span><span class="p">)</span>
+</span><span class="line">    <span class="p">{</span>
+</span><span class="line">      <span class="cm">/* Copy just a few bytes to make DSTP aligned.  */</span>
+</span><span class="line">      <span class="n">len</span> <span class="o">-=</span> <span class="p">(</span><span class="o">-</span><span class="n">dstp</span><span class="p">)</span> <span class="o">%</span> <span class="n">OPSIZ</span><span class="p">;</span>
+</span><span class="line">      <span class="n">BYTE_COPY_FWD</span> <span class="p">(</span><span class="n">dstp</span><span class="p">,</span> <span class="n">srcp</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="n">dstp</span><span class="p">)</span> <span class="o">%</span> <span class="n">OPSIZ</span><span class="p">);</span>
+</span><span class="line">
+</span><span class="line">      <span class="cm">/* Copy whole pages from SRCP to DSTP by virtual address manipulation,</span>
+</span><span class="line"><span class="cm">     as much as possible.  */</span>
+</span><span class="line">
+</span><span class="line">      <span class="n">PAGE_COPY_FWD_MAYBE</span> <span class="p">(</span><span class="n">dstp</span><span class="p">,</span> <span class="n">srcp</span><span class="p">,</span> <span class="n">len</span><span class="p">,</span> <span class="n">len</span><span class="p">);</span>
+</span><span class="line">
+</span><span class="line">      <span class="cm">/* Copy from SRCP to DSTP taking advantage of the known alignment of</span>
+</span><span class="line"><span class="cm">     DSTP.  Number of bytes remaining is put in the third argument,</span>
+</span><span class="line"><span class="cm">     i.e. in LEN.  This number may vary from machine to machine.  */</span>
+</span><span class="line">
+</span><span class="line">      <span class="n">WORD_COPY_FWD</span> <span class="p">(</span><span class="n">dstp</span><span class="p">,</span> <span class="n">srcp</span><span class="p">,</span> <span class="n">len</span><span class="p">,</span> <span class="n">len</span><span class="p">);</span>
+</span><span class="line">
+</span><span class="line">      <span class="cm">/* Fall out and copy the tail.  */</span>
+</span><span class="line">    <span class="p">}</span>
+</span><span class="line">
+</span><span class="line">  <span class="cm">/* There are just a few bytes to copy.  Use byte memory operations.  */</span>
+</span><span class="line">  <span class="n">BYTE_COPY_FWD</span> <span class="p">(</span><span class="n">dstp</span><span class="p">,</span> <span class="n">srcp</span><span class="p">,</span> <span class="n">len</span><span class="p">);</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">return</span> <span class="n">dstpp</span><span class="p">;</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>苹果darwin内核xnu</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>memcpy</span><a href="http://www.opensource.apple.com/source/xnu/xnu-2050.18.24/libsyscall/wrappers/memcpy.c">link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+<span class="line-number">33</span>
+<span class="line-number">34</span>
+<span class="line-number">35</span>
+<span class="line-number">36</span>
+<span class="line-number">37</span>
+<span class="line-number">38</span>
+<span class="line-number">39</span>
+<span class="line-number">40</span>
+<span class="line-number">41</span>
+<span class="line-number">42</span>
+<span class="line-number">43</span>
+<span class="line-number">44</span>
+<span class="line-number">45</span>
+<span class="line-number">46</span>
+<span class="line-number">47</span>
+<span class="line-number">48</span>
+<span class="line-number">49</span>
+<span class="line-number">50</span>
+<span class="line-number">51</span>
+<span class="line-number">52</span>
+<span class="line-number">53</span>
+<span class="line-number">54</span>
+<span class="line-number">55</span>
+<span class="line-number">56</span>
+<span class="line-number">57</span>
+</pre></td><td class="code"><pre><code class="c"><span class="line"><span class="k">typedef</span> <span class="kt">int</span> <span class="n">word</span><span class="p">;</span>       <span class="cm">/* &quot;word&quot; used for optimal copy speed */</span>
+</span><span class="line">
+</span><span class="line"><span class="cp">#define wsize   sizeof(word)</span>
+</span><span class="line"><span class="cp">#define wmask   (wsize - 1)</span>
+</span><span class="line">
+</span><span class="line"><span class="cm">/*</span>
+</span><span class="line"><span class="cm"> * Copy a block of memory, handling overlap.</span>
+</span><span class="line"><span class="cm"> * This is the routine that actually implements</span>
+</span><span class="line"><span class="cm"> * (the portable versions of) bcopy, memcpy, and memmove.</span>
+</span><span class="line"><span class="cm"> */</span>
+</span><span class="line"><span class="n">__private_extern__</span>
+</span><span class="line"><span class="kt">void</span> <span class="o">*</span> <span class="nf">memcpy</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">dst0</span><span class="p">,</span> <span class="k">const</span> <span class="kt">void</span> <span class="o">*</span><span class="n">src0</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">length</span><span class="p">)</span>
+</span><span class="line"><span class="p">{</span>
+</span><span class="line">    <span class="kt">char</span> <span class="o">*</span><span class="n">dst</span> <span class="o">=</span> <span class="n">dst0</span><span class="p">;</span>
+</span><span class="line">    <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">src</span> <span class="o">=</span> <span class="n">src0</span><span class="p">;</span>
+</span><span class="line">    <span class="kt">size_t</span> <span class="n">t</span><span class="p">;</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">if</span> <span class="p">(</span><span class="n">length</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">dst</span> <span class="o">==</span> <span class="n">src</span><span class="p">)</span>      <span class="cm">/* nothing to do */</span>
+</span><span class="line">        <span class="k">goto</span> <span class="n">done</span><span class="p">;</span>
+</span><span class="line">
+</span><span class="line">    <span class="cm">/*</span>
+</span><span class="line"><span class="cm">     * Macros: loop-t-times; and loop-t-times, t&gt;0</span>
+</span><span class="line"><span class="cm">     */</span>
+</span><span class="line"><span class="cp">#define TLOOP(s) if (t) TLOOP1(s)</span>
+</span><span class="line"><span class="cp">#define TLOOP1(s) do { s; } while (--t)</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">if</span> <span class="p">((</span><span class="kt">unsigned</span> <span class="kt">long</span><span class="p">)</span><span class="n">dst</span> <span class="o">&lt;</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">long</span><span class="p">)</span><span class="n">src</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">        <span class="cm">/*</span>
+</span><span class="line"><span class="cm">         * Copy forward.</span>
+</span><span class="line"><span class="cm">         */</span>
+</span><span class="line">        <span class="n">t</span> <span class="o">=</span> <span class="p">(</span><span class="kt">uintptr_t</span><span class="p">)</span><span class="n">src</span><span class="p">;</span> <span class="cm">/* only need low bits */</span>
+</span><span class="line">        <span class="k">if</span> <span class="p">((</span><span class="n">t</span> <span class="o">|</span> <span class="p">(</span><span class="kt">uintptr_t</span><span class="p">)</span><span class="n">dst</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">wmask</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="line">            <span class="cm">/*</span>
+</span><span class="line"><span class="cm">             * Try to align operands.  This cannot be done</span>
+</span><span class="line"><span class="cm">             * unless the low bits match.</span>
+</span><span class="line"><span class="cm">             */</span>
+</span><span class="line">            <span class="k">if</span> <span class="p">((</span><span class="n">t</span> <span class="o">^</span> <span class="p">(</span><span class="kt">uintptr_t</span><span class="p">)</span><span class="n">dst</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">wmask</span> <span class="o">||</span> <span class="n">length</span> <span class="o">&lt;</span> <span class="n">wsize</span><span class="p">)</span>
+</span><span class="line">                <span class="n">t</span> <span class="o">=</span> <span class="n">length</span><span class="p">;</span>
+</span><span class="line">            <span class="k">else</span>
+</span><span class="line">                <span class="n">t</span> <span class="o">=</span> <span class="n">wsize</span> <span class="o">-</span> <span class="p">(</span><span class="n">t</span> <span class="o">&amp;</span> <span class="n">wmask</span><span class="p">);</span>
+</span><span class="line">            <span class="n">length</span> <span class="o">-=</span> <span class="n">t</span><span class="p">;</span>
+</span><span class="line">            <span class="n">TLOOP1</span><span class="p">(</span><span class="o">*</span><span class="n">dst</span><span class="o">++</span> <span class="o">=</span> <span class="o">*</span><span class="n">src</span><span class="o">++</span><span class="p">);</span>
+</span><span class="line">        <span class="p">}</span>
+</span><span class="line">        <span class="cm">/*</span>
+</span><span class="line"><span class="cm">         * Copy whole words, then mop up any trailing bytes.</span>
+</span><span class="line"><span class="cm">         */</span>
+</span><span class="line">        <span class="n">t</span> <span class="o">=</span> <span class="n">length</span> <span class="o">/</span> <span class="n">wsize</span><span class="p">;</span>
+</span><span class="line">        <span class="n">TLOOP</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">word</span> <span class="o">*</span><span class="p">)</span><span class="n">dst</span> <span class="o">=</span> <span class="o">*</span><span class="p">(</span><span class="n">word</span> <span class="o">*</span><span class="p">)</span><span class="n">src</span><span class="p">;</span> <span class="n">src</span> <span class="o">+=</span> <span class="n">wsize</span><span class="p">;</span> <span class="n">dst</span> <span class="o">+=</span> <span class="n">wsize</span><span class="p">);</span>
+</span><span class="line">        <span class="n">t</span> <span class="o">=</span> <span class="n">length</span> <span class="o">&amp;</span> <span class="n">wmask</span><span class="p">;</span>
+</span><span class="line">        <span class="n">TLOOP</span><span class="p">(</span><span class="o">*</span><span class="n">dst</span><span class="o">++</span> <span class="o">=</span> <span class="o">*</span><span class="n">src</span><span class="o">++</span><span class="p">);</span>
+</span><span class="line">    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class="line">        <span class="cm">/*Copy backwords.*/</span>
+</span><span class="line">        <span class="cm">/*...pass...*/</span>
+</span><span class="line">    <span class="p">}</span>
+</span><span class="line"><span class="nl">done:</span>
+</span><span class="line">    <span class="k">return</span> <span class="p">(</span><span class="n">dst0</span><span class="p">);</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>算法的精髓在于确定一个<strong>合适</strong>的近似迭代初值，通过有限次牛顿逼近得到精度范围允许的结果。</p>
+
+<h6 id="newton-raphson-method">2.2 化曲为直：牛顿法(<strong>Newton-Raphson Method</strong>)</h6>
+
+<image src="/images/NewtonIteration_Ani.gif" width="400" height="300" />
+
+<p>已知浮点数<script type="math/tex">x > 0</script>，欲计算<script type="math/tex">y = {\sqrt x}</script>，定义函数<script type="math/tex">f(y) = \frac{1}{y^2} - x = 0</script>，问题转换为求<script type="math/tex">f(x)</script>的<em>正数根</em>。
+代入迭代公式</p>
+
+<script type="math/tex; mode=display">
+y_{n+1} = y_{n} - \frac{f(y_n)}{f'(y_n)}
+</script>
+
+<p>有</p>
+
+<script type="math/tex; mode=display">
+y_{n+1} = \frac{y_{n}(3-xy_n^2)}{2} \label{eq:ref10}
+</script>
+
+<p>，其中<script type="math/tex">f(y)=\frac{1}{y^2}-x</script>，<script type="math/tex">f'(y)=\frac{-2}{y^3}</script>。整理<script type="math/tex">\eqref{eq:ref10}</script>得</p>
+
+<script type="math/tex; mode=display">
+y_{n+1} = \frac{y_{n}(3-xy_n^2)}{2} = y_{n}(1.5-\frac{xy_n^2}{2})
+</script>
+
+<p>，迭代一次即代码第12行</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>q_math.c  start:11 mark:12</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class="c"><span class="line"><span class="n">y</span>  <span class="o">=</span> <span class="o">*</span> <span class="p">(</span> <span class="kt">float</span> <span class="o">*</span> <span class="p">)</span> <span class="o">&amp;</span><span class="n">i</span><span class="p">;</span>
+</span><span class="line"><span class="n">y</span>  <span class="o">=</span> <span class="n">y</span> <span class="o">*</span> <span class="p">(</span> <span class="n">threehalfs</span> <span class="o">-</span> <span class="p">(</span> <span class="n">x2</span> <span class="o">*</span> <span class="n">y</span> <span class="o">*</span> <span class="n">y</span> <span class="p">)</span> <span class="p">);</span>   <span class="c1">// 1st iteration</span>
+</span><span class="line"><span class="c1">//  y  = y * ( threehalfs - ( x2 * y * y ) );   // 2nd iteration, this can be removed</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h4 id="section-4">2.3 美好开始：初值<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup></h4>
+
+<p>接下需要确定迭代公式的近似初值<script type="math/tex">y_{0}</script>。</p>
+
+<p>32位浮点数</p>
+
+<p>已知32位浮点数IEEE-754二进制表示形式</p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>S(ign)</td>
+      <td>E(xponent)</td>
+      <td>M(antissa)</td>
+    </tr>
+    <tr>
+      <td>1 bit</td>
+      <td>8 bits</td>
+      <td>23 bits</td>
+    </tr>
+    <tr>
+      <td>bit 31</td>
+      <td>30 ← bits → 23</td>
+      <td>30 ← bits → 23</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>其中<code>S</code>为符号位，<code>E</code>为经过偏移的8位指数，剩下23位为尾数<code>M</code>。浮点数值则表示成</p>
+
+<script type="math/tex; mode=display">
+x = {\left( { - 1} \right)^S}\left( {1.M} \right){2^{E - B}}
+</script>
+
+<p>对应整数值</p>
+
+<script type="math/tex; mode=display">
+I = S \cdot {2^{31}} + E \cdot {2^{23}} + M
+</script>
+
+<p><script type="math/tex">m</script>和<script type="math/tex">M</script>，<script type="math/tex">e</script>和<script type="math/tex">E</script>之间具有转换关系</p>
+
+<script type="math/tex; mode=display">
+\left\{
+\begin{array}{c}
+m = \frac{M}{L}, m \in \left[ 0, 1 \right ) \\
+e = E - B
+\end{array}
+\right.
+</script>
+
+<p>其中偏移量<script type="math/tex">B = 2^{b-1} - 1</script>, 基底<script type="math/tex">L = 2^{n-b-1}</script>。对于32位浮点数，<script type="math/tex">B = 2^{7} - 1 = 127</script>，<script type="math/tex">L = 2^{23} </script>。</p>
+
+<p>相应地推广至具有b位指数的n位二进制浮点数, <script type="math/tex">x</script>和<script type="math/tex">I_x</script>分别为</p>
+
+<script type="math/tex; mode=display">
+\left\{
+\begin{array}{c}
+x = \left( {1 + {m_x}} \right)2^{e_x}\\
+{I_x} = {E_x}L + {M_x}
+\end{array}
+\right.
+</script>
+
+<p>对于给定参数<script type="math/tex">x</script>，其平方根倒数为</p>
+
+<script type="math/tex; mode=display">
+y = \frac{1}{\sqrt x } = x^{-\frac{1}{2}}
+</script>
+
+<p>等式两边同时取基底2的对数，</p>
+
+<script type="math/tex; mode=display">
+{\log _2}y =  - \frac{1}{2}{\log _2}x
+</script>
+
+<p>代入<script type="math/tex">x</script>和<script type="math/tex">y</script>的浮点形式，</p>
+
+<script type="math/tex; mode=display">
+{\log _2}\left( {1 + {m_y}} \right) =  - \frac{1}{2}{\log _2}\left( {1 + {m_x}} \right) - \frac{1}{2}{e_x}
+</script>
+
+<p>两边具有同类项</p>
+
+<script type="math/tex; mode=display">\log \left( {1 + x} \right ) </script>
+
+<p>已知当<script type="math/tex">0 \le x \le 1</script>，有<script type="math/tex">\log \left( {1 + x} \right ) \approx x </script>。令<script type="math/tex">{\log _2} \left( {1 + x} \right) \cong x + \sigma</script>，
+<script type="math/tex">\sigma</script>为某个常量(事实上两端不尽相同)。这样上式可以简化成线性形式</p>
+
+<script type="math/tex; mode=display">
+{m_x} + \sigma  + {e_y} \approx  - \frac{1}{2}\left( {m_x} + \sigma  + {e_x} \right)
+</script>
+
+<p>代入</p>
+
+<script type="math/tex; mode=display">
+\begin{array}{l}
+\frac{M_y}{L} + \sigma  + {E_y} - B \approx  - \frac{1}{2}\left( {\frac{M_x}{L} + \sigma  + {E_x} - B} \right)\\
+ \Rightarrow \frac{M_y}{L} + {E_y} \approx  - \frac{1}{2}\left( {\frac{M_x}{L} + {E_x}} \right) - \frac{3}{2}\left( {\sigma  - B} \right)\\
+ \Rightarrow {M_y} + L{E_y} \approx \frac{3}{2}L\left( {B - \sigma} \right) - \frac{1}{2}\left( {M_x} + L{E_x} \right)
+\end{array}
+</script>
+
+<p>由此可得 <script type="math/tex"> {I_y} = R - \frac{1}{2}{I_x} </script>，此处<script type="math/tex">R = \frac{3}{2}\left( {B - \sigma } \right)L</script>。</p>
+
+<p>方程</p>
+
+<script type="math/tex; mode=display">
+y_{0} = {I_y} = R - \frac{1}{2}{I_x} \label{ref1}
+</script>
+
+<p>刚好对应魔幻代码</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="c"><span class="line"><span class="n">i</span>  <span class="o">=</span> <span class="mh">0x5f3759df</span> <span class="o">-</span> <span class="p">(</span> <span class="n">i</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span> <span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h4 id="section-5">2.4 魔法数字之谜：误差分析<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup></h4>
+
+<p><script type="math/tex">\eqref{ref1}</script>式魔法数字R二进制表示为</p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>R1</td>
+      <td>R2</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>同理，给定浮点数<script type="math/tex">x > 0</script>(代码中为变量<code>i</code>和<code>number</code>)，二进制表示为</p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>E</td>
+      <td>M</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>接下来分别就<code>E</code>奇偶两种情况讨论。为统一起见，下面视尾数<code>M</code>和<code>R2</code>为浮点小数，即</p>
+
+<script type="math/tex; mode=display">
+\left\{
+\begin{array}{c}
+M \leftarrow m = \frac{M}{L} \\
+R_{2} \leftarrow r_{2} = \frac{R_{2}}{L}
+\end{array}
+\right.
+</script>
+
+<h5 id="e">2.4.1 指数E为偶数</h5>
+
+<p>指数E为偶数，<script type="math/tex">\left\lfloor E / 2 \right\rfloor = E / 2</script>，此时<script type="math/tex">e = E - 127 = 2d + 1</script>为奇数，
+对于<code>i &gt;&gt; 1</code>操作，指数<code>E</code>没有有效位右移至尾数<code>M</code>，由此可得初值<script type="math/tex">y_{0}</script>的指数部分</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+
+\begin{align}
+R_{1} - \left\lfloor \frac{E}{2} \right\rfloor &= R_{1} - \frac{E}{2} \\
+    &= R_{1} - \frac{e + 127}{2} \\
+    &= R_{1} - \frac{2d + 1 + 127}{2} \\
+    & = R_{1} - 64 - d \\
+    & > 0
+\end{align}
+ %]]></script>
+
+<p><script type="math/tex">\forall E\in \left[ 0..254 \right]</script>，指数之差<script type="math/tex"> R_{1} - \left\lfloor \frac{E}{2} \right\rfloor \gt 0 </script>。如果为负，则符号位为1，而平方根倒数不可为负数。如果为0，尾数部分作减法必要时可能得从指数部分借位。
+故<script type="math/tex">R_{1} \ge 128</script>。同样地有<script type="math/tex">y_{0}</script>的尾数部分<script type="math/tex">R - \left\lfloor M / 2 \right\rfloor</script>(计算时视为整数)，当<script type="math/tex">R_{2} \ge \left\lfloor M / 2 \right\rfloor</script>，
+综上得</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+
+\begin{align}
+y_{0} &= \left( 1 + R_{2} - \frac{M}{2} \right)2^{\left( R_{1} - 64 -d \right) - 127} \\
+    &= \left( 1 + R_{2} - \frac{M}{2} \right)2^{\left( R_{1} - 191 -d \right)} \\
+    &= \left( 2 + R_{2} - \frac{M}{2} \right)2^{\left( R_{1} - 192 -d \right)} \label{ref2}
+\end{align} 
+ %]]></script>
+
+<p>注意<script type="math/tex">M / 2 = \left\lfloor M / 2 \right\rfloor</script>，因为<script type="math/tex">M</script>视为小数时两者之差不超过<script type="math/tex">2^{-24}</script>。
+当<script type="math/tex">R_{2} \lt M / 2</script>，尾数从指数借一位，相当于<script type="math/tex">y_{0}</script>的值减半。
+有借位时尾数变成<script type="math/tex">\left( 1 + R_{2} - \left\lfloor M /2 \right\rfloor \right)</script>，仍位于区间<script type="math/tex">\left[0, 1\right)</script>。同样地有初值</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+
+\begin{align}
+y_{0} &= \left( 1 + \left( 1 + R_{2} - \frac{M}{2} \right)\right)2^{\left( R_{1} - 64 -d\right) - 127 -1} \\
+    &= \left( 2 + R_{2} - \frac{M}{2} \right)2^{\left( R_{1} - 192 -d\right) } \label{ref3}
+\end{align} 
+ %]]></script>
+
+<p>，尾数统一成和没有借位的情况一样。</p>
+
+<p>定义公共项</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+
+{\beta}_{ M }^{ R_{2}} = \left\{
+\begin{array}{c}
+2R_{2} - M &: R_{2} \ge M / 2 \\
+R_{2} - M/2 &: R_{2} \lt M 
+\end{array}
+\right.
+ %]]></script>
+
+<p><script type="math/tex">\eqref{ref2}</script>式和<script type="math/tex">\eqref{ref3}</script>式中的<script type="math/tex">y_{0}</script>合并成统一表示：</p>
+
+<script type="math/tex; mode=display">
+y_{ 0 }=\left( 2+{ \beta }_{ M }^{ R_{ 2 } } \right) 2^{ { R_{ 1 }-192-d } }
+</script>
+
+<p>注意<script type="math/tex">{ \beta  }_{ M }^{ R_{ 2 } }</script>是连续函数，除去<script type="math/tex">R = M / 2</script>点在其定义域可导。代入<script type="math/tex">e = 2d + 1</script>，<script type="math/tex">y = \frac{1}{\sqrt{x}}</script>的近似值为</p>
+
+<script type="math/tex; mode=display">
+\frac{1}{\sqrt{1 + M}} 2^{-e/2} = \frac{1}{\sqrt{1 + M}} 2^{-d - 1/2} = \frac{1}{\sqrt{2} \sqrt{1+M}} 2^{-d}
+</script>
+
+<p>引入相对误差<script type="math/tex">\left\lvert \frac{y - y_{0}}{y} \right\rvert</script>作为精度评估标准，</p>
+
+<script type="math/tex; mode=display">
+\left\lvert \frac{\frac{1}{\sqrt{2} \sqrt{1+M}} 2^{-d} - \left( 2+{ \beta }_{ M }^{ R_{ 2 } } \right) 2^{ { R_{ 1 }-192-d } } }{\frac{1}{\sqrt{2} \sqrt{1+M}} 2^{-d}} \right\rvert
+</script>
+
+<p>化简为<script type="math/tex">\left\lvert \varepsilon _{0} \left ( M, R \right )  \right\rvert</script>，</p>
+
+<script type="math/tex; mode=display">
+\varepsilon _{0} \left ( M, R \right ) = 1 - \sqrt{2} \sqrt(1 + M) \left( 2 + \beta_{M}^{R_{2}} \right) 2^{R_{1} - 192}
+</script>
+
+<p>为关于<script type="math/tex">M</script>的减函数，其中<script type="math/tex">M \in I = \left[0, 1 \right)</script>。函数与<script type="math/tex">d</script>无关，但仅当<script type="math/tex">E</script>为偶数时成立，故隐式地依赖于<script type="math/tex">E</script>。</p>
+
+<p>假设相对误差<script type="math/tex">% <![CDATA[
+\max _{ M \in I }{\left\lvert \varepsilon _{0} \right\rvert} < 1/8 %]]></script>，即</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+
+\begin{align}
+\frac{1}{8} & \gt \max _{M \in I}{\left\lvert \varepsilon _{0} \right\rvert} \\
+            & \ge \left\lvert \varepsilon _{0} \right\rvert \\
+            & = \left\lvert 1 - \sqrt{2} \left( 2 + 2R_{2} \right) 2^{R_{1} - 192} \right\rvert \\
+            & = \left\lvert 1 - \left( 1 + R_{2} \right) 2^{R_{1} - 190.5} \right\rvert
+\end{align}
+ %]]></script>
+
+<p>展开得，</p>
+
+<script type="math/tex; mode=display">
+\begin{align}
+\frac{1}{8} \lt 1 - \left( 1 + R_{2} \right)2^{R_{1} - 190.5} \lt \frac{1}{8} \\
+\end{align}
+</script>
+
+<script type="math/tex; mode=display">
+\begin{align}
+\frac{9}{8} \ge \frac{9}{8 \left ( 1 + R_{2} \right )} \gt 2^{R_{1} - 190.5} \gt \frac{7}{8 \left ( 1 + R_{2} \right ) } \gt \frac{7}{16}
+\end{align}
+</script>
+
+<p>两边同时取对数<script type="math/tex">log_{2}</script>并加上<script type="math/tex">190.5</script>，<script type="math/tex">190.7 \gt 189.2</script>，位于该区间的唯一整数是</p>
+
+<script type="math/tex; mode=display">
+R_{1} = 190 = 0xbe
+</script>
+
+<p>当<script type="math/tex">E</script>为偶数的情况下可以确保误差控制在<script type="math/tex">0.125</script>以内。</p>
+
+<h5 id="e-1">2.4.2 指数E为奇数</h5>
+
+<p>顺着上面的思路，我们来分析一类更复杂的情况。区别在于代码<code>i&gt;&gt;1</code>将指数E的奇数低位移入尾数的高位。
+这意味着移位后的实数值加上$1/2$变成<script type="math/tex">\left\lfloor M/2 \right\rfloor + 1/2</script>。<script type="math/tex">e = E - 127 = 2d</script>为奇数，同上得</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+
+\begin{align}
+R_{1} - \left\lfloor \frac{E}{2} \right\rfloor &= R_{1} -  \left\lfloor \frac{e + 127}{2} \right\rfloor \\
+    &= R_{1} -  \left\lfloor \frac{2d + 127}{2} \right\rfloor \\
+    &= R_{1} - 63 - d
+\end{align}
+ %]]></script>
+
+<p>大于0。</p>
+
+<p>用<script type="math/tex">M/2</script>替换<script type="math/tex">\left\lfloor M/2 \right\rfloor</script>。尾数部分变成<script type="math/tex">R_{2} - (M/2 + 1/2)</script>，当<script type="math/tex">R_{2} \ge \frac{M+1}{2}</script>，不会像指数部分产生
+借位。故有</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+
+\begin{align}
+y_{0} &= \left( 1 + R_{2} - \left( \frac{M}{2} + \frac{1}{2} \right) \right)2^{\left( R_{1} - 63 -d \right) - 127} \\
+    &= \left( \frac{1}{2} + R_{2} - \frac{M}{2} \right)2^{\left( R_{1} - 190 -d \right)} \\
+    &= \left( 2 + 4R_{2} - 2M \right)2^{\left( R_{1} - 192 -d \right)}
+\end{align}
+ %]]></script>
+
+<p>当<script type="math/tex">R_{2} \lt \frac{M + 1}{2}</script>，<code>R - (i &gt;&gt; 1)</code>将从指数部分借位，相当于<script type="math/tex">y_{0}</script>除以2，即尾数变成<script type="math/tex">1 + R_{2} -(\frac{M}{2} + \frac{1}{2})</script>
+仍属于<script type="math/tex">I</script>。此时</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+
+\begin{align}
+y_{0} &= \left( 1 + \left( 1 + R_{2} - \left( \frac{M}{2} + \frac{1}{2} \right) \right) \right)2^{\left( R_{1} - 63 -d \right) - 127 - 1} \\
+    &= \left( \frac{3}{2} + R_{2} - \frac{M}{2} \right)2^{\left( R_{1} - 191 -d \right)} \\
+    &= \left( 3 + 2R_{2} - M \right)2^{\left( R_{1} - 192 -d \right)}
+\end{align}
+ %]]></script>
+
+<p>同<script type="math/tex">\beta_{M}^{R_{2}}</script>定义</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+
+{\gamma}_{ M }^{ R_{2}} = \left\{
+\begin{array}{c}
+4R_{2}-2M &: 2R_{2} \ge M + 1 \\
+1 + 2R_{2} - M &: 2R_{2} \lt M + 1
+\end{array}
+\right.
+ %]]></script>
+
+<p>两个<script type="math/tex">y_{0}</script>统一写成</p>
+
+<script type="math/tex; mode=display">
+y_{0} = \left( 2 + \gamma_{M}^{R_{2}} \right)2^{R_{1} - 192 - d}
+</script>
+
+<p>注意<script type="math/tex">{ \beta  }_{ M }^{ R_{ 2 } }</script>是连续函数，除去<script type="math/tex">R = M / 2</script>点在其定义域可微。代入<script type="math/tex">e = 2d </script>，<script type="math/tex">y = \frac{1}{\sqrt{x}}</script>的近似值为</p>
+
+<script type="math/tex; mode=display">
+\frac{1}{\sqrt{1 + M}} 2^{-e/2} = \frac{1}{\sqrt{1 + M}} 2^{-d - 1/2} = \frac{1}{\sqrt{2} \sqrt{1+M}} 2^{-d}
+</script>
+
+<p>和<script type="math/tex">E</script>为偶数的近似值，缩小<script type="math/tex">\sqrt{2}</script></p>
+
+<p>相对误差<script type="math/tex">\left\lvert \varepsilon _{0} \left ( M, R \right )  \right\rvert</script>化简为</p>
+
+<script type="math/tex; mode=display">
+\varepsilon _{1} \left ( M, R \right ) = 1 - \sqrt{1 + M} \left( 2 + \gamma_{M}^{R_{2}} \right) 2^{R_{1} - 192}
+</script>
+
+<p>与d无关（同样地隐式地与<script type="math/tex">E</script>有关）。</p>
+
+<p>误差分析同上。以<script type="math/tex">R_{1} = 190 = 0xbe</script>为基准，重新定义误差函数如下</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+
+\begin{align}
+\varepsilon _{0} \left ( M, R_{2} \right ) &= 1 - \sqrt{2} \sqrt{1 + M} \left( 2 + \beta_{M}^{R_{2}} \right) \\
+\varepsilon _{1} \left ( M, R_{2} \right ) &= 1 - \sqrt{1 + M} \left( 2 + \gamma_{M}^{R_{2}} \right)
+\end{align}
+ %]]></script>
+
+<p>仅与<script type="math/tex">M</script>和<script type="math/tex">R_{2}</script>，均属于区间<script type="math/tex">I</script>。</p>
+
+<h5 id="section-6">例二</h5>
+<p>当<script type="math/tex">x = 16</script>，有<script type="math/tex">E = 4 + 127 = 131</script>为奇数，<script type="math/tex">M = 0</script>，<script type="math/tex">x</script>右移一位则指数末位移入尾数高位。
+执行<code>i  = 0x5f3759df - ( i &gt;&gt; 1 );</code>后近似初值<script type="math/tex">y_{0}</script>为<code>0x3e7759df</code>。相减之后生成新指数
+<script type="math/tex">190 - \left \lfloor 131/2 \right \rfloor = 125 = 0x7d</script>，即<script type="math/tex">e = 125 - 127 = -2</script>。
+新尾数从新指数借入一位，致使<script type="math/tex">e = -3</script>，以及新尾数<script type="math/tex">0xb759df - 0x4000000 = 0x7759df</script>，对应<script type="math/tex">M = 0.932430148</script>。
+故<script type="math/tex">y_{0} = (1 + M)2^{-3} = 0.241553</script>，非常接近<script type="math/tex">\frac{1}{\sqrt{x}} = 0.25</script>。</p>
+
+<blockquote><p>致广大而尽精微</p></blockquote>
+
+<h4 id="section-7">2.5 尾数优化</h4>
+
+<p>尾数优化在于最小化<script type="math/tex">\max _{ M\in I }{\left\lvert \varepsilon _{0} \left ( M, R_{2} \right ) \right\rvert, \left\lvert \varepsilon _{1} \left ( M, R_{2} \right ) \right\rvert  }</script>。由于<script type="math/tex">\varepsilon_{0}</script>和<script type="math/tex">\varepsilon_{1}</script>连续且分段可导，因此<script type="math/tex">M</script>值出现在分段区间的端点或者驻点。</p>
+
+<h5 id="leftlvert-varepsilon-0-rightrvert">2.5.1 求<script type="math/tex">\left\lvert \varepsilon _{0} \right\rvert</script>最大值</h5>
+<p>考察端点：<script type="math/tex">M = 0</script>，<script type="math/tex">M = 1</script>和<script type="math/tex">R_{2} = M / 2</script>（该点<script type="math/tex">\beta_{M}^{R_{2}}</script>不可导）。
+当<script type="math/tex">M = 0</script>，<script type="math/tex">\beta_{M}^{R_{2}} = 2R_{2}</script>，则</p>
+
+<script type="math/tex; mode=display">
+f_{1} \left ( R_{2} \right ) = \varepsilon _{0} \left ( 0, R_{2} \right ) = 1 - \sqrt{2} \sqrt{1 + 0} \left ( 2 + 2R_{2} \right ) / 4 = 1 - \frac{1 + R_{2}}{\sqrt{2}}
+</script>
+
+<p>类似地，当<script type="math/tex">R_{2} = M / 2</script>，<script type="math/tex">\beta_{M}^{R_{2}} = 0</script>，有</p>
+
+<script type="math/tex; mode=display">
+f_{2} \left ( R_{2} \right ) = \varepsilon _{0} \left ( R_{2}, R_{2} \right ) = 1 - \sqrt{2} \sqrt{1 + 2R_{2}} \left ( 2 + 0 \right ) / 4 = 1 - \sqrt{\frac{1 + 2R_{2}}{2}}
+</script>
+
+<p>当<script type="math/tex">M = 1</script>分情况考虑<script type="math/tex">\beta_{ M }^{ R_{2}}</script></p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+
+f_{2} \left ( R_{2} \right ) = \varepsilon _{0} \left (1, R_{2} \right ) = 
+\left\{
+\begin{array}{c}
+\frac{1}{2} \left ( 1 - 2R_{2} \right ) &: R_{2} \ge 1/2 \\
+\frac{1}{4} \left ( 1 - 2R_{2} \right ) &: R_{2} \lt 1/2
+\end{array}
+\right.
+ %]]></script>
+
+<p>再分情况考察驻点。假设<script type="math/tex">R_{2} \ge M / 2</script>，解方程<script type="math/tex">\frac{\partial \varepsilon _{0}}{\partial M} = 0</script></p>
+
+<script type="math/tex; mode=display">
+\begin{align}
+\frac{\partial \left ( 1 - \sqrt{2} \sqrt{1 + M} \left ( 2 + \beta_{M}^{R_{2}} \right ) / 4 \right ) }{\partial M} = 0 \\
+\frac{\partial \sqrt{1 + M} \left ( 2 + \beta_{M}^{R_{2}} \right ) }{\partial M} = 0 \\
+\end{align}
+</script>
+
+<p>代入<script type="math/tex">\beta_{M}^{R_{2}} = 2 R_{2} - M</script>，</p>
+
+<script type="math/tex; mode=display">
+\frac{1}{2}(1 + M)^{-\frac{1}{2}} \left ( 1 + 2R_{2} - M  \right ) - (1 + M)^{\frac{1}{2}} = 0
+</script>
+
+<p>得驻点<script type="math/tex">M = \frac{2}{3}R_{2}</script>，</p>
+
+<script type="math/tex; mode=display">
+f_{4} \left ( R_{2} \right ) = \varepsilon _{0} \left (\frac{2R_{2}}{3}, R_{2} \right ) = 1 - \frac{\left ( 1 + \frac{2}{3} R_{2} \right ) ^ {\frac{3}{2}} }{\sqrt{2}}
+</script>
+
+<p><script type="math/tex">R_{2} \lt M/2</script>时，<script type="math/tex">\beta_{M}^{R_{2}} = R_{2} - M / 2</script>，</p>
+
+<script type="math/tex; mode=display">
+\frac{1}{2}(1 + M)^{-\frac{1}{2}} \left ( 1 + R_{2} - \frac{M}{2}  \right ) - \frac{1}{2} (1 + M)^{\frac{1}{2}} = 0
+</script>
+
+<p>驻点为<script type="math/tex">M = \frac{2}{3} \left ( 1 + R_{2} \right )</script>。不过只对<script type="math/tex">R_{2} \in \left [ 0, \frac{1}{2} \right )</script>有效，故有</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+
+f_{5} \left ( R_{2} \right ) = 
+\left\{
+\begin{array}{c}
+0 &: R_{2} \ge 1/2 \\
+\varepsilon _{0} \left ( \frac{2}{3} \left ( 1 + R_{2} \right ), R_{2}\right ) = 1 - \frac{\left ( 5 + 2R_{2} \right )^{3/2}}{6\sqrt{6}} &: R_{2} \lt 1/2
+\end{array}
+\right.
+ %]]></script>
+
+<h5 id="leftlvert-varepsilon-1-rightrvert">2.5.2 求<script type="math/tex">\left\lvert \varepsilon _{1} \right\rvert</script>最大值</h5>
+
+<p>分析过程同上，</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+
+\begin{align}
+f_{6} \left ( R_{2} \right ) = \varepsilon _{1} \left (0, R_{2} \right ) = 
+\left\{
+\begin{array}{c}
+\frac{1}{2} - R_{2} &: R_{2} \ge 1/2 \\
+\frac{1}{4} \left ( 1 - 2R_{2} \right ) &: R_{2} \lt 1/2
+\end{array}
+\right.
+
+f_{7} \left ( R_{2} \right ) = \varepsilon _{1} \left (1, R_{2} \right ) = 
+\left\{
+\begin{array}{c}
+1 - \sqrt{2}R_{2} &: R_{2} \ge 1 \\
+1 - \left ( 1 - R_{2} \right ) / \sqrt{2} &: R_{2} \lt 1
+\end{array}
+\right.
+\end{align}
+ %]]></script>
+
+<p>对于端点<script type="math/tex">R = \frac{M + 1} {2}</script>，<script type="math/tex">\gamma _{M} ^{R_{2}} = 2</script>，不过只对<script type="math/tex">R_{2} \ge 1/2</script>有效，该点</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+
+\begin{align}
+f_{8} \left ( R_{2} \right ) = 
+\left\{
+\begin{array}{c}
+\varepsilon _{1} \left ( 2R_{2} - 1, R_{2} \right ) = 1 - \sqrt{2R_{2}} &: R_{2} \ge 1/2 \\
+0 &: R_{2} \lt 1/2
+\end{array}
+\right.
+\end{align}
+ %]]></script>
+
+<p>驻点同样分两种情况。<script type="math/tex">R_{2} \ge M/2 + 1/2</script>时驻点为<script type="math/tex">M = \frac{2R_{2} - 1}{3}</script>，此时<script type="math/tex">R_{2} \ge \frac{1}{2}</script>；同样<script type="math/tex">R_{2} \lt \frac{M + 1}{2}</script>
+处有驻点<script type="math/tex">M = \frac{2R_{2} + 1}{3}</script>，此时<script type="math/tex">R_{2} \lt \frac{1}{2}</script>。合二为一</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+
+\begin{align}
+f_{9} \left ( R_{2} \right ) = 
+\left\{
+\begin{array}{c}
+\varepsilon _{1} \left ( \frac{2R_{2} - 1}{3}, R_{2} \right ) = 1 - \left ( \frac{2}{3} \left ( 1 + R_{2} \right ) \right )^{3/2} &: R_{2} \ge 1/2 \\
+\varepsilon _{1} \left ( \frac{2R_{2} + 1}{3}, R_{2} \right ) = 1 - \sqrt{2} \left ( \frac{2 + R_{2}}{3} \right )^{3/2} &: R_{2} \lt 1/2 \\
+\end{array}
+\right.
+\end{align}
+ %]]></script>
+
+<p>注意除<script type="math/tex">f_{9}</script>以外所有<script type="math/tex">f_{i}</script>均连续。</p>
+
+<image src="/images/figures/figure1.jpg" width="400" height="300" />
+
+<image src="/images/figures/figure2.jpg" width="400" height="300" />
+
+<p>所有最大值的最低点在<script type="math/tex">R_{2} = 0.45</script>附近，非常接近程序中的<code>0.432430148</code>。</p>
+
+<script type="math/tex; mode=display">
+r_{0} = 0.432744889959443195468521587014
+</script>
+
+<p>对应整数值<script type="math/tex">R_{2} = \left\lfloor 2^{23}r_{0} + 0.5 \right\rfloor = 0x37642f</script>。附加指数<script type="math/tex">R_{1} = 0xbe</script>，移后之位为<script type="math/tex">0x5f</script>，得到最优常数
+$$
+R = 0x5f37642f
+$$</p>
+
+<h5 id="section-8">3. 测试</h5>
+
+<p>重写源码去掉牛顿逼近部分，保留计算近似初值部分</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+</pre></td><td class="code"><pre><code class="cpp"><span class="line"><span class="kt">float</span> <span class="n">InvSqrtLinear</span><span class="p">(</span><span class="kt">float</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">magic</span><span class="p">)</span>
+</span><span class="line"><span class="p">{</span>
+</span><span class="line">    <span class="kt">float</span> <span class="n">xhalf</span> <span class="o">=</span> <span class="mf">0.5f</span> <span class="o">*</span> <span class="n">x</span><span class="p">;</span>
+</span><span class="line">    <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="o">*</span><span class="p">(</span><span class="kt">int</span><span class="o">*</span><span class="p">)</span> <span class="o">&amp;</span><span class="n">x</span><span class="p">;</span>         <span class="c1">// get bits for floating value</span>
+</span><span class="line">    <span class="n">i</span> <span class="o">=</span> <span class="n">magic</span> <span class="o">-</span> <span class="p">(</span><span class="n">i</span><span class="o">&gt;&gt;</span><span class="mi">1</span><span class="p">);</span>         <span class="c1">// gives initial guess y0</span>
+</span><span class="line">    <span class="n">x</span> <span class="o">=</span> <span class="o">*</span><span class="p">(</span><span class="kt">float</span><span class="o">*</span><span class="p">)</span> <span class="o">&amp;</span><span class="n">i</span><span class="p">;</span>           <span class="c1">// convert bits back to float</span>
+</span><span class="line">    <span class="k">return</span> <span class="n">x</span><span class="p">;</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>另分别执行一轮或两轮牛顿逼近（经过第二轮耗时不长而精度较高）。每个测试遍历所有浮点值，最大相对误差百分比如下</p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>Value</td>
+      <td>Predicted</td>
+      <td>Tested</td>
+      <td>1 Iteration</td>
+      <td>2 Iterations</td>
+    </tr>
+    <tr>
+      <td>0x5f3759df</td>
+      <td>3.43758</td>
+      <td>3.43756</td>
+      <td>0.175228</td>
+      <td>4.66e-004</td>
+    </tr>
+    <tr>
+      <td>0x5f37642f</td>
+      <td>3.42128</td>
+      <td>3.42128</td>
+      <td>0.177585</td>
+      <td>4.77521e-004</td>
+    </tr>
+    <tr>
+      <td>0x5f375a86</td>
+      <td>3.43655</td>
+      <td>3.43652</td>
+      <td>0.175124</td>
+      <td>4.65437e-004</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>从上表可见第三个常数<script type="math/tex">0x5f375a86</script>最优。</p>
+
+<h4 id="section-9">参考文献</h4>
+<div class="footnotes">
+  <ol>
+    <li id="fn:1">
+      <p>McEniry, Charles. <a href="http://www.daxia.com/bibis/upload/406Fast_Inverse_Square_Root.pdf">The Mathematics Behind the Fast Inverse Square Root Function Code</a><a href="#fnref:1" rel="reference">&#8617;</a></p>
+    </li>
+    <li id="fn:2">
+      <p>Lomont, Chris. <a href="http://www.lomont.org/Math/Papers/2003/InvSqrt.pdf">Fast Inverse Square Root</a><a href="#fnref:2" rel="reference">&#8617;</a></p>
+    </li>
+  </ol>
+</div>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/05/03/fast-fibonacci/">[译]快速斐波那契算法</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+
+<time datetime="2014-05-03T08:55:00+08:00" pubdate data-updated="true">May 3<span>rd</span>, 2014</time>
+        
+         | <a href="/blog/2014/05/03/fast-fibonacci/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><div class="note info">
+  <h5>摘要</h5>
+  <p>本文译自<a href="http://hbfs.wordpress.com/2012/05/22/fast-fibonacci/" target="_blank" title="Fast Fibonacci">Fast Fibonacci</a></p>
+</div>
+
+<p><a href="http://en.wikipedia.org/wiki/Fibonacci_number">斐波那契数列</a>在诸多方面，从<a href="http://www.maths.surrey.ac.uk/hosted-sites/R.Knott/Fibonacci/fibnat.html#seeds">头状花序</a>到<a href="http://en.wikipedia.org/wiki/Universal_code_%28data_compression%29">通用编码</a>（如<a href="http://books.google.ca/books?id=81AfzW6vux4C&amp;pg=PA100&amp;lpg=PA100&amp;dq=%22taboo+codes%22&amp;source=bl&amp;ots=PVUooaK7Fm&amp;sig=hdBqPpvYlRNWskAMrVawTO6i_k4&amp;hl=en&amp;sa=X&amp;ei=P0WyT9qmLsqIgwfa34m7CQ&amp;redir_esc=y#v=onepage&amp;q=%22taboo%20codes%22&amp;f=false">禁忌编码</a>）表现出种种有趣的性质。研究高效计算斐氏数列的过程充满乐趣。</p>
+
+<p>斐波那契数列的经典公式表示为如下递推形式：</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+
+F_n=\begin{cases}
+    1 & \mathrm{if~}n\leqslant{2} \\
+    F_{n-1}+F_{n-2} &\mathrm{otherwise}
+\end{cases}
+ %]]></script>
+
+<p>由此引出其直观（朴素）的递归实现：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+</pre></td><td class="code"><pre><code class="c"><span class="line"><span class="kt">uint64_t</span> <span class="nf">fibo_rec</span><span class="p">(</span><span class="kt">uint64_t</span> <span class="n">n</span><span class="p">)</span>
+</span><span class="line"><span class="p">{</span>
+</span><span class="line">    <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">2</span><span class="p">)</span>
+</span><span class="line">        <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class="line">    <span class="k">else</span>
+</span><span class="line">        <span class="k">return</span> <span class="n">fibo_rec</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">fibo_rec</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">2</span><span class="p">);</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>看上去很完美，可是计算<script type="math/tex">F_n</script>的过程中产生了<script type="math/tex">O(F_n)</script>次递归调用！运行时间呈指数增长（因为<script type="math/tex">F_n \approx \phi^n</script>，其中<script type="math/tex">\phi=\frac{1}{2}(1+\sqrt{5})</script>为黄金比例）。</p>
+
+<p>通过显式地优化尾递可以消除递归调用：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+</pre></td><td class="code"><pre><code class="c"><span class="line"><span class="kt">uint64_t</span> <span class="nf">fibo_iter</span><span class="p">(</span><span class="kt">uint64_t</span> <span class="n">n</span><span class="p">)</span>
+</span><span class="line"><span class="p">{</span>
+</span><span class="line">    <span class="kt">uint64_t</span> <span class="n">n_1</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n_2</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">for</span> <span class="p">(</span><span class="kt">uint64_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+</span><span class="line">    <span class="p">{</span>
+</span><span class="line">        <span class="kt">uint64_t</span> <span class="n">t</span> <span class="o">=</span> <span class="n">n_1</span> <span class="o">+</span> <span class="n">n_2</span><span class="p">;</span>
+</span><span class="line">        <span class="n">n_2</span> <span class="o">=</span> <span class="n">n_1</span><span class="p">;</span>
+</span><span class="line">        <span class="n">n_1</span> <span class="o">=</span> <span class="n">t</span><span class="p">;</span>
+</span><span class="line">    <span class="p">}</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">return</span> <span class="n">n_1</span><span class="p">;</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>这次计算<script type="math/tex">F_n</script>的时间复杂度下降到<script type="math/tex">O(n)</script>，大大优于原始递归版本。迭代版本借助临时变量保存和，并使用移位寄存器将后继的<strong>斐波那契数列</strong>分别保存到<code>n_2</code>和<code>n_1</code>。有些人可能会忌讳临时变量，那么可以将上述代码重写为： </p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+</pre></td><td class="code"><pre><code class="c"><span class="line"><span class="kt">uint64_t</span> <span class="nf">fibo_iter_var</span><span class="p">(</span><span class="kt">uint64_t</span> <span class="n">n</span><span class="p">)</span>
+</span><span class="line"><span class="p">{</span>
+</span><span class="line">    <span class="kt">uint64_t</span> <span class="n">n_1</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n_2</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">for</span> <span class="p">(</span><span class="kt">uint64_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+</span><span class="line">    <span class="p">{</span>
+</span><span class="line">        <span class="n">n_1</span> <span class="o">=</span> <span class="n">n_1</span> <span class="o">+</span> <span class="n">n_2</span><span class="p">;</span>
+</span><span class="line">        <span class="n">n_2</span> <span class="o">=</span> <span class="n">n_1</span> <span class="o">-</span> <span class="n">n_2</span><span class="p">;</span>
+</span><span class="line">    <span class="p">}</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">return</span> <span class="n">n_1</span><span class="p">;</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p><code>n_2 = n_1 - n_2</code>部分化简得<code>n_1</code>（<script type="math/tex">n_2 \gets n_1 - n_2</script>，即<script type="math/tex">n_2 \gets (n_1 + n_2) - n_2</script>，结果为<script type="math/tex">n_2 \gets n_1</script>）。此处我们通过额外操作抵消掉临时变量，好坏别当别论。</p>
+
+<center>&#8258;</center>
+
+<p>是否有进一步优化的空间？根据以往的经验，线性时间似乎是最好的结果。无独有偶，有些聪明的家伙发现矩阵</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+
+\left[
+    \begin{array}{cc}
+       0 & 1 \\
+       1 & 1 
+    \end{array}
+\right]
+ %]]></script>
+
+<p>具有“平移”并增加一个矢量分量的性质。比如</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+
+\left[
+    \begin{array}{cc}
+        0 & 1 \\
+        1 & 1
+    \end{array}
+\right]
+\left[
+    \begin{array}{c}
+        a\\
+        b
+    \end{array}
+\right]
+=
+\left[
+    \begin{array}{cc}
+        b\\
+        a + b
+    \end{array}
+\right]
+ %]]></script>
+
+<p>看上去有几分眼熟吧。事实上我们将<code>a</code>代换为<script type="math/tex">F_ {n-2}</script>，<code>b</code>代换为<script type="math/tex">F_ {n-1}</script>，得</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+
+\left[
+    \begin{array}{cc}
+        0 & 1\\
+        1 & 1
+    \end{array}
+\right]
+\left[
+    \begin{array}{cc}
+        F_{n-2}\\
+        F_{n-1}
+    \end{array}
+\right]
+=
+\left[
+    \begin{array}{cc}
+        F_{n-2}\\
+        F_{n-1} + F_{n-2}
+    \end{array}
+\right]
+=
+\left[
+    \begin{array}{c}
+        F_{n-1}\\
+        F_n
+    \end{array}
+\right]
+ %]]></script>
+
+<p>有点眉目了！但这是基于已知<script type="math/tex">F_ {n-1}</script>和<script type="math/tex">F_ {n-2}</script>的前提下，一旦成立意味着存在（递归）分解形式：</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+
+\left[
+    \begin{array}{cc}
+        0 & 1\\
+        1 & 1
+    \end{array}
+\right]
+\left[
+    \begin{array}{cc}
+        F_{n-2}\\
+        F_{n-1}
+    \end{array}
+\right]
+=
+\left[
+    \begin{array}{cc}
+        0 & 1\\
+        1 & 1
+    \end{array}
+\right]
+\left[
+    \begin{array}{cc}
+        0 & 1\\
+        1 & 1
+    \end{array}
+\right]
+\left[
+    \begin{array}{cc}
+        F_{n-3}\\
+        F_{n-2}
+    \end{array}
+\right]
+ %]]></script>
+
+<p>反复如此迭代到初始条件<script type="math/tex">F_1 = 1</script>和<script type="math/tex">F_2 = 1</script>，那么有</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+
+\left[
+    \begin{array}{cc}
+        0 & 1\\
+        1 & 1
+    \end{array}
+\right]^n
+\left[
+    \begin{array}{c}
+        1\\
+        1
+    \end{array}
+\right]
+=
+\left[
+    \begin{array}{c}
+        F_{n-1}\\
+        F_{n}
+    \end{array}
+\right]
+ %]]></script>
+
+<p>矩阵运算似乎代价不菲，至少要进行线性次数的矩阵乘法。幸运的是不需要那么多次，我们有办法在<script type="math/tex">O(\lg n)</script>时间复杂度内计算出<script type="math/tex">A^n</script>（此处矩阵维数为常数<script type="math/tex">2 \times{2}</script>，故可视矩阵乘积为常量）。如何计算呢？且观察式子<script type="math/tex">x^5 = (x^2)^2x</script>和<script type="math/tex">x^7 =((x^2)x)^2x</script>。整数情况时<script type="math/tex">x^n</script>计算过程如下：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+</pre></td><td class="code"><pre><code class="c"><span class="line"><span class="kt">int</span> <span class="nf">expo</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">int</span> <span class="n">n</span><span class="p">)</span>
+</span><span class="line"><span class="p">{</span>
+</span><span class="line">    <span class="kt">int</span> <span class="n">t</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class="line">    <span class="kt">int</span> <span class="n">y</span> <span class="o">=</span> <span class="n">x</span><span class="p">;</span>
+</span><span class="line">    <span class="k">while</span> <span class="p">(</span><span class="n">n</span><span class="p">)</span>
+</span><span class="line">    <span class="p">{</span>
+</span><span class="line">        <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span>
+</span><span class="line">            <span class="n">t</span> <span class="o">*=</span> <span class="n">y</span><span class="p">;</span>
+</span><span class="line">        <span class="n">y</span> <span class="o">*=</span> <span class="n">y</span><span class="p">;</span>
+</span><span class="line">        <span class="n">n</span> <span class="o">&gt;&gt;=</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class="line">    <span class="p">}</span>
+</span><span class="line">    <span class="k">return</span> <span class="n">t</span><span class="p">;</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>矩阵计算方式同理可得。以上代码中<code>t</code>为乘积当前值，<code>y</code>为乘积“平方”。给定两个矩阵</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+
+\left[
+    \begin{array}{cc}
+        a_t & b_t \\
+        c_t & d_t
+    \end{array}
+\right]
+ %]]></script>
+
+<p>和</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+
+\left[
+    \begin{array}{cc}
+        a_y & b_y \\
+        c_y & d_y
+    \end{array}
+\right]
+ %]]></script>
+
+<p>第一个初始化为<strong>单位阵</strong>，第二个初始化为<strong>斐波那契矩阵</strong>。根据矩阵的对称性，<script type="math/tex">c_t</script>和<script type="math/tex">c_y</script>各自恒等于<script type="math/tex">b_t</script>和<script type="math/tex">b_y</script>，这两个变量可以分别消掉。</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+
+\left[
+    \begin{array}{cc}
+        a_t & b_t \\
+        c_t & d_t
+    \end{array}
+\right]
+\left[
+    \begin{array}{cc}
+        a_y & b_y \\
+        c_y & d_y
+    \end{array}
+\right]
+=
+\left[
+    \begin{array}{cc}
+        a_t a_y + b_t b_y & a_t b_y + b_t d_y\\
+        --- & b_t b_y + d_t d_y
+    \end{array}
+\right]
+ %]]></script>
+
+<p>和</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+
+\left[
+    \begin{array}{cc}
+        a_y & b_y \\
+        c_y & d_y
+    \end{array}
+\right]^2
+=
+\left[
+    \begin{array}{cc}
+        a_y^2 + b_y^2 & b_y(a_y + d_y)\\
+        --- & b_y^2 + d_y^2
+    \end{array}
+\right]
+ %]]></script>
+
+<p>其中虚线位置表示对称部分。将上述式子代入幂函数，将有</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+</pre></td><td class="code"><pre><code class="c"><span class="line"><span class="kt">uint64_t</span> <span class="nf">fibo_expo</span><span class="p">(</span><span class="kt">uint64_t</span> <span class="n">n</span><span class="p">)</span>
+</span><span class="line"><span class="p">{</span>
+</span><span class="line">    <span class="kt">uint64_t</span> <span class="n">a_t</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">b_t</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">d_t</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="c1">// &quot;1&quot;</span>
+</span><span class="line">            <span class="n">a_y</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">b_y</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">d_y</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="c1">// &quot;y&quot;</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">while</span> <span class="p">(</span><span class="n">n</span><span class="p">)</span>
+</span><span class="line">    <span class="p">{</span>
+</span><span class="line">        <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span>
+</span><span class="line">        <span class="p">{</span>
+</span><span class="line">            <span class="c1">// t*=y;</span>
+</span><span class="line">            <span class="kt">uint64_t</span> <span class="n">a</span> <span class="o">=</span> <span class="n">a_t</span> <span class="o">*</span> <span class="n">a_y</span> <span class="o">+</span> <span class="n">b_t</span> <span class="o">*</span> <span class="n">b_y</span><span class="p">;</span>
+</span><span class="line">            <span class="kt">uint64_t</span> <span class="n">b</span> <span class="o">=</span> <span class="n">a_t</span> <span class="o">*</span> <span class="n">b_y</span> <span class="o">+</span> <span class="n">b_t</span> <span class="o">*</span> <span class="n">d_y</span><span class="p">;</span>
+</span><span class="line">            <span class="kt">uint64_t</span> <span class="n">d</span> <span class="o">=</span> <span class="n">b_t</span> <span class="o">*</span> <span class="n">b_y</span> <span class="o">+</span> <span class="n">d_t</span> <span class="o">*</span> <span class="n">d_y</span><span class="p">;</span>
+</span><span class="line">
+</span><span class="line">            <span class="n">a_t</span> <span class="o">=</span> <span class="n">a</span><span class="p">;</span>
+</span><span class="line">            <span class="n">b_t</span> <span class="o">=</span> <span class="n">b</span><span class="p">;</span>
+</span><span class="line">            <span class="n">d_t</span> <span class="o">=</span> <span class="n">d</span><span class="p">;</span>
+</span><span class="line">        <span class="p">}</span>
+</span><span class="line">
+</span><span class="line">        <span class="c1">//y*=y;</span>
+</span><span class="line">        <span class="kt">uint64_t</span> <span class="n">a</span> <span class="o">=</span> <span class="n">a_y</span> <span class="o">*</span> <span class="n">a_y</span> <span class="o">+</span> <span class="n">b_y</span> <span class="o">*</span> <span class="n">b_y</span><span class="p">;</span>
+</span><span class="line">        <span class="kt">uint64_t</span> <span class="n">b</span> <span class="o">=</span> <span class="n">b_y</span> <span class="o">*</span> <span class="p">(</span><span class="n">a_y</span> <span class="o">+</span> <span class="n">d_y</span><span class="p">);</span>
+</span><span class="line">        <span class="kt">uint64_t</span> <span class="n">d</span> <span class="o">=</span> <span class="n">b_y</span> <span class="o">*</span> <span class="n">b_y</span> <span class="o">+</span> <span class="n">d_y</span> <span class="o">*</span> <span class="n">d_y</span><span class="p">;</span>
+</span><span class="line">
+</span><span class="line">        <span class="n">a_y</span> <span class="o">=</span> <span class="n">a</span><span class="p">;</span>
+</span><span class="line">        <span class="n">b_y</span> <span class="o">=</span> <span class="n">b</span><span class="p">;</span>
+</span><span class="line">        <span class="n">d_y</span> <span class="o">=</span> <span class="n">d</span><span class="p">;</span>
+</span><span class="line">
+</span><span class="line">        <span class="n">n</span> <span class="o">&gt;&gt;=</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class="line">    <span class="p">}</span>
+</span><span class="line">    <span class="k">return</span> <span class="n">b_t</span><span class="p">;</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>提取出公共子式，改变赋值顺序，消除多余的临时变量，得</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+</pre></td><td class="code"><pre><code class="c"><span class="line"><span class="kt">uint64_t</span> <span class="nf">fibo_expo_var</span><span class="p">(</span><span class="kt">uint64_t</span> <span class="n">n</span><span class="p">)</span>
+</span><span class="line"><span class="p">{</span>
+</span><span class="line">    <span class="kt">uint64_t</span> <span class="n">a_t</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">b_t</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">d_t</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="c1">// &quot;1&quot;</span>
+</span><span class="line">            <span class="n">a_y</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">b_y</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">d_y</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="c1">// &quot;y&quot;</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">while</span> <span class="p">(</span><span class="n">n</span><span class="p">)</span>
+</span><span class="line">    <span class="p">{</span>
+</span><span class="line">        <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span>
+</span><span class="line">        <span class="p">{</span>
+</span><span class="line">            <span class="c1">// t*=y;</span>
+</span><span class="line">            <span class="kt">uint64_t</span> <span class="n">bx</span> <span class="o">=</span> <span class="n">b_t</span> <span class="o">*</span> <span class="n">b_y</span><span class="p">;</span>
+</span><span class="line">            <span class="n">b_t</span> <span class="o">=</span> <span class="n">a_t</span> <span class="o">*</span> <span class="n">b_y</span> <span class="o">+</span> <span class="n">b_t</span> <span class="o">*</span> <span class="n">d_y</span><span class="p">;</span>
+</span><span class="line">            <span class="n">a_t</span> <span class="o">=</span> <span class="n">a_t</span> <span class="o">*</span> <span class="n">a_y</span> <span class="o">+</span> <span class="n">bx</span><span class="p">;</span>
+</span><span class="line">            <span class="n">d_t</span> <span class="o">=</span> <span class="n">bx</span> <span class="o">+</span> <span class="n">d_t</span> <span class="o">*</span> <span class="n">d_y</span><span class="p">;</span>
+</span><span class="line">        <span class="p">}</span>
+</span><span class="line">
+</span><span class="line">        <span class="c1">//y*=y;</span>
+</span><span class="line">        <span class="kt">uint64_t</span> <span class="n">b2</span> <span class="o">=</span> <span class="n">b_y</span> <span class="o">*</span> <span class="n">b_y</span><span class="p">;</span>
+</span><span class="line">        <span class="n">b_y</span> <span class="o">*=</span> <span class="p">(</span><span class="n">a_y</span> <span class="o">+</span> <span class="n">d_y</span><span class="p">);</span>
+</span><span class="line">        <span class="n">a_y</span> <span class="o">=</span> <span class="n">a_y</span> <span class="o">*</span> <span class="n">a_y</span> <span class="o">+</span> <span class="n">b2</span><span class="p">;</span>
+</span><span class="line">        <span class="n">d_y</span> <span class="o">=</span> <span class="n">b2</span> <span class="o">+</span> <span class="n">d_y</span> <span class="o">*</span> <span class="n">d_y</span><span class="p">;</span>
+</span><span class="line">
+</span><span class="line">        <span class="n">n</span> <span class="o">&gt;&gt;=</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class="line">    <span class="p">}</span>
+</span><span class="line">    <span class="k">return</span> <span class="n">b_t</span><span class="p">;</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<center>&#8258;</center>
+
+<p>太棒了，我们找着了一个<script type="math/tex">O(\lg n)</script>的算法来计算斐波那契数列。不过仍有稍加改进的余地。再怎么改进呢？且注意，</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+
+\left[
+    \begin{array}{cc}
+        a & b\\
+        b & d
+    \end{array}
+\right]
+=
+\left[
+    \begin{array}{cc}
+        a & b\\
+        b & a+b
+    \end{array}
+\right]
+ %]]></script>
+
+<p>这样一来消去变量<code>d</code>，得到仅包含变量<code>a</code>和<code>b</code>的方程。修改乘积项和平方项使其只包含变量<code>a</code>和<code>b</code>：</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+
+\left[
+    \begin{array}{cc}
+        a_t & b_t\\
+        b_t & a_t + b_t
+    \end{array}
+\right]
+\left[
+    \begin{array}{cc}
+        a_y & b_y\\
+        b_y & a_y + b_y
+    \end{array}
+\right]
+=
+\left[
+    \begin{array}{cc}
+        a_ta_y+b_t + b_y & a_tb_y + b_t(ay+b_y)\\
+        --- & ---
+    \end{array}
+\right]
+ %]]></script>
+
+<p>以及</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+
+\left[
+    \begin{array}{cc}
+        a_y & b_y\\
+        b_y & d_y
+    \end{array}
+\right]^2
+=
+\left[
+    \begin{array}{cc}
+        a_y^2+b_y^2 & a_yb_y+b_y(a_y+b_y)\\
+        --- & ---
+    \end{array}
+\right]
+ %]]></script>
+
+<p>其中虚线表示无需关心的部分。利用上述结果，可得：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+</pre></td><td class="code"><pre><code class="c"><span class="line"><span class="kt">uint64_t</span> <span class="nf">fibo_expo_var_2</span><span class="p">(</span><span class="kt">uint64_t</span> <span class="n">n</span><span class="p">)</span>
+</span><span class="line"><span class="p">{</span>
+</span><span class="line">    <span class="kt">uint64_t</span> <span class="n">a_t</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">b_t</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="c1">// &quot;1&quot;</span>
+</span><span class="line">            <span class="n">a_y</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">b_y</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="c1">// &quot;y&quot;</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">while</span> <span class="p">(</span><span class="n">n</span><span class="p">)</span>
+</span><span class="line">    <span class="p">{</span>
+</span><span class="line">        <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span>
+</span><span class="line">        <span class="p">{</span>
+</span><span class="line">            <span class="c1">// t*=y;</span>
+</span><span class="line">            <span class="kt">uint64_t</span> <span class="n">bx</span> <span class="o">=</span> <span class="n">b_t</span> <span class="o">*</span> <span class="n">b_y</span><span class="p">;</span>
+</span><span class="line">            <span class="n">b_t</span> <span class="o">=</span> <span class="n">a_t</span> <span class="o">*</span> <span class="n">b_y</span> <span class="o">+</span> <span class="n">b_t</span> <span class="o">*</span> <span class="n">a_y</span> <span class="o">+</span> <span class="n">bx</span><span class="p">;</span>
+</span><span class="line">            <span class="n">a_t</span> <span class="o">=</span> <span class="n">a_t</span> <span class="o">*</span> <span class="n">a_y</span> <span class="o">+</span> <span class="n">bx</span><span class="p">;</span>
+</span><span class="line">        <span class="p">}</span>
+</span><span class="line">
+</span><span class="line">        <span class="c1">//y*=y;</span>
+</span><span class="line">        <span class="kt">uint64_t</span> <span class="n">b2</span> <span class="o">=</span> <span class="n">b_y</span> <span class="o">*</span> <span class="n">b_y</span><span class="p">;</span>
+</span><span class="line">        <span class="n">b_y</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">a_y</span> <span class="o">*</span> <span class="n">b_y</span> <span class="o">+</span> <span class="n">b2</span><span class="p">;</span>
+</span><span class="line">        <span class="n">a_y</span> <span class="o">=</span> <span class="n">a_y</span> <span class="o">*</span> <span class="n">a_y</span> <span class="o">+</span> <span class="n">b2</span><span class="p">;</span>
+</span><span class="line">
+</span><span class="line">        <span class="n">n</span> <span class="o">&gt;&gt;=</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class="line">    <span class="p">}</span>
+</span><span class="line">    <span class="k">return</span> <span class="n">b_t</span><span class="p">;</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>这几个算法就运行速度比较结果如何？原始递归算法效率低得惊人，生成<script type="math/tex">F_ {50}</script>需要一分多钟，而其他算法只花费几微秒。进行10000000（1000万）次迭代测试（使用相同的随机输入，随机数<script type="math/tex">n</script>位于1到70之间），结果如下</p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>iter</td>
+      <td>3.29529s</td>
+    </tr>
+    <tr>
+      <td>iter_var</td>
+      <td>3.30153s</td>
+    </tr>
+    <tr>
+      <td>expo</td>
+      <td>2.28118s</td>
+    </tr>
+    <tr>
+      <td>expo_var</td>
+      <td>2.2531s</td>
+    </tr>
+    <tr>
+      <td>expo_var_2</td>
+      <td>2.22531s</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><br />
+最后三个版本的确快很多，但是快速乘幂算法版本之间的效率差距并不显著。假如改进程度相比迭代版本没有那么大的话，我们应该意识到刚只是计算相对较小的斐波那契数列。64位无符号整数最大仅允许存储<script type="math/tex">F_{92}</script>（因为<script type="math/tex">log_ \phi 2^{64} \approx 92</script>，<script type="math/tex">F_n \approx \phi^n</script>，所以两边取对数解出<script type="math/tex">n</script>，推出<script type="math/tex">\phi^n = 2^{64}</script>），不过通过大整数（抽象为类）来计算<script type="math/tex">F_{129713151}</script>，远比迭代方法和递归算法快得多得多。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/04/27/the-abuse-of-design-patterns-in-writing-a-hello-world-program/">[译]设计模式滥用之Hello World</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+
+<time datetime="2014-04-27T11:27:00+08:00" pubdate data-updated="true">Apr 27<span>th</span>, 2014</time>
+        
+         | <a href="/blog/2014/04/27/the-abuse-of-design-patterns-in-writing-a-hello-world-program/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><div class="note info">
+  <h5>摘要</h5>
+  <p>本文译自<a href="http://taskinoor.wordpress.com/2011/09/21/the-abuse-of-design-patterns-in-writing-a-hello-world-program/" target="_blank" title="The Abuse of Design Patterns in writing a Hello World Program">The Abuse of Design Patterns in writing a Hello World Program</a></p>
+</div>
+
+<blockquote><p>设计模式流行之初，我曾在某新闻组里看到一条评论，说有人号称他们试图倾尽23个GoF设计模式去编写一个奇葩程序。不过他们说最终没有成，极其所能也只用到其中20个。他们希望客户叫他们返工，没准能加塞另外3个。</p><p>试图用遍所有模式是行不通的，终将以生拼硬凑的设计告终——投机取巧的设计充满百无一用的灵活性。这年头软件太过复杂了。我们不能猜测还要什么，而应该关注于本该要什么。</p></blockquote>
+
+<p><strong>gamma</strong><sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> </p>
+
+<p>大家刚开始学习设计模式时，很少考虑模式的适用场景，想方设法到处套用，觉得模式用得越多，设计越好。结果产生大量不必要复杂的代码。<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup></p>
+
+<p>与其说是“运用模式”，不如说是“滥用模式”。有人试图在<strong>Hello World</strong>程序中套用模式，不可避免地导致滥用。</p>
+
+<p>让我们考察一个示例。这是一个经典问题： 编写一个程序，打印字符串<code>Hello World</code>至标准输出。</p>
+
+<p>编程新手会写出如下代码（Java语言）：</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="java"><span class="line"><span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;hello world&quot;</span><span class="o">);</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>这段代码看起来超乎简单。能否加点设计模式？接下来…</p>
+
+<p>首先，定义两个接口<code>Subject</code>和<code>Observer</code>，加入<strong>观察者模式</strong>。</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+</pre></td><td class="code"><pre><code class="java"><span class="line"><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">Subject</span> <span class="o">{</span>
+</span><span class="line">    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">attach</span><span class="o">(</span><span class="n">Observer</span> <span class="n">observer</span><span class="o">);</span>
+</span><span class="line">    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">detach</span><span class="o">(</span><span class="n">Observer</span> <span class="n">observer</span><span class="o">);</span>
+</span><span class="line">    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">notifyObservers</span><span class="o">();</span>
+</span><span class="line"><span class="o">}</span>
+</span><span class="line">
+</span><span class="line"><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">Observer</span> <span class="o">{</span>
+</span><span class="line">    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">update</span><span class="o">(</span><span class="n">Subject</span> <span class="n">subject</span><span class="o">);</span>
+</span><span class="line"><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>然后，定义两个类<code>HelloWorldSubject</code>和<code>HelloWorldObserver</code>实现以上两个接口。</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+<span class="line-number">33</span>
+<span class="line-number">34</span>
+<span class="line-number">35</span>
+<span class="line-number">36</span>
+<span class="line-number">37</span>
+<span class="line-number">38</span>
+<span class="line-number">39</span>
+<span class="line-number">40</span>
+<span class="line-number">41</span>
+<span class="line-number">42</span>
+<span class="line-number">43</span>
+<span class="line-number">44</span>
+<span class="line-number">45</span>
+<span class="line-number">46</span>
+</pre></td><td class="code"><pre><code class="java"><span class="line"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">HelloWorldSubject</span> <span class="kd">implements</span> <span class="n">Subject</span> <span class="o">{</span>
+</span><span class="line">
+</span><span class="line">    <span class="kd">private</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Observer</span><span class="o">&gt;</span> <span class="n">observers</span><span class="o">;</span>
+</span><span class="line">    <span class="kd">private</span> <span class="n">String</span> <span class="n">str</span><span class="o">;</span>
+</span><span class="line">
+</span><span class="line">    <span class="kd">public</span> <span class="nf">HelloWorldSubject</span><span class="o">()</span> <span class="o">{</span>
+</span><span class="line">        <span class="kd">super</span><span class="o">();</span>
+</span><span class="line">
+</span><span class="line">        <span class="n">observers</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Observer</span><span class="o">&gt;();</span>
+</span><span class="line">    <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">attach</span><span class="o">(</span><span class="n">Observer</span> <span class="n">observer</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">        <span class="n">observers</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">observer</span><span class="o">);</span>
+</span><span class="line">    <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">detach</span><span class="o">(</span><span class="n">Observer</span> <span class="n">observer</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">        <span class="n">observers</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="n">observer</span><span class="o">);</span>
+</span><span class="line">    <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">notifyObservers</span><span class="o">()</span> <span class="o">{</span>
+</span><span class="line">        <span class="n">Iterator</span><span class="o">&lt;</span><span class="n">Observer</span><span class="o">&gt;</span> <span class="n">iter</span> <span class="o">=</span> <span class="n">observers</span><span class="o">.</span><span class="na">iterator</span><span class="o">();</span>
+</span><span class="line">
+</span><span class="line">        <span class="k">while</span> <span class="o">(</span><span class="n">iter</span><span class="o">.</span><span class="na">hasNext</span><span class="o">())</span> <span class="o">{</span>
+</span><span class="line">            <span class="n">Observer</span> <span class="n">observer</span> <span class="o">=</span> <span class="n">iter</span><span class="o">.</span><span class="na">next</span><span class="o">();</span>
+</span><span class="line">            <span class="n">observer</span><span class="o">.</span><span class="na">update</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
+</span><span class="line">        <span class="o">}</span>
+</span><span class="line">    <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">    <span class="kd">public</span> <span class="n">String</span> <span class="nf">getStr</span><span class="o">()</span> <span class="o">{</span>
+</span><span class="line">        <span class="k">return</span> <span class="n">str</span><span class="o">;</span>
+</span><span class="line">    <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setStr</span><span class="o">(</span><span class="n">String</span> <span class="n">str</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">        <span class="k">this</span><span class="o">.</span><span class="na">str</span> <span class="o">=</span> <span class="n">str</span><span class="o">;</span>
+</span><span class="line">        <span class="n">notifyObservers</span><span class="o">();</span>
+</span><span class="line">    <span class="o">}</span>
+</span><span class="line"><span class="o">}</span>
+</span><span class="line">
+</span><span class="line"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">HelloWorldObserver</span> <span class="kd">implements</span> <span class="n">Observer</span> <span class="o">{</span>
+</span><span class="line">
+</span><span class="line">    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">update</span><span class="o">(</span><span class="n">Subject</span> <span class="n">subject</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">        <span class="n">HelloWorldSubject</span> <span class="n">sub</span> <span class="o">=</span> <span class="o">(</span><span class="n">HelloWorldSubject</span><span class="o">)</span><span class="n">subject</span><span class="o">;</span>
+</span><span class="line">        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">sub</span><span class="o">.</span><span class="na">getStr</span><span class="o">());</span>
+</span><span class="line">    <span class="o">}</span>
+</span><span class="line">
+</span><span class="line"><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>接着，再添加一个<strong>命令模式</strong>。</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+</pre></td><td class="code"><pre><code class="java"><span class="line"><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">Command</span> <span class="o">{</span>
+</span><span class="line">    <span class="kt">void</span> <span class="nf">execute</span><span class="o">();</span>
+</span><span class="line"><span class="o">}</span>
+</span><span class="line">
+</span><span class="line"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">HelloWorldCommand</span> <span class="kd">implements</span> <span class="n">Command</span> <span class="o">{</span>
+</span><span class="line">
+</span><span class="line">    <span class="kd">private</span> <span class="n">HelloWorldSubject</span> <span class="n">subject</span><span class="o">;</span>
+</span><span class="line">
+</span><span class="line">    <span class="kd">public</span> <span class="nf">HelloWorldCommand</span><span class="o">(</span><span class="n">Subject</span> <span class="n">subject</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">        <span class="kd">super</span><span class="o">();</span>
+</span><span class="line">
+</span><span class="line">        <span class="k">this</span><span class="o">.</span><span class="na">subject</span> <span class="o">=</span> <span class="o">(</span><span class="n">HelloWorldSubject</span><span class="o">)</span><span class="n">subject</span><span class="o">;</span>
+</span><span class="line">    <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">execute</span><span class="o">()</span> <span class="o">{</span>
+</span><span class="line">        <span class="n">subject</span><span class="o">.</span><span class="na">setStr</span><span class="o">(</span><span class="s">&quot;hello world&quot;</span><span class="o">);</span>
+</span><span class="line">    <span class="o">}</span>
+</span><span class="line">
+</span><span class="line"><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>然后添加一个<strong>抽象工厂模式</strong>。</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+</pre></td><td class="code"><pre><code class="java"><span class="line"><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">AbstractFactory</span> <span class="o">{</span>
+</span><span class="line">    <span class="kd">public</span> <span class="n">Subject</span> <span class="nf">createSubject</span><span class="o">();</span>
+</span><span class="line">    <span class="kd">public</span> <span class="n">Observer</span> <span class="nf">createObserver</span><span class="o">();</span>
+</span><span class="line">    <span class="kd">public</span> <span class="n">Command</span> <span class="nf">createCommand</span><span class="o">(</span><span class="n">Subject</span> <span class="n">subject</span><span class="o">);</span>
+</span><span class="line"><span class="o">}</span>
+</span><span class="line">
+</span><span class="line"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">HelloWorldFactory</span> <span class="kd">implements</span> <span class="n">AbstractFactory</span> <span class="o">{</span>
+</span><span class="line">
+</span><span class="line">    <span class="kd">public</span> <span class="n">Subject</span> <span class="nf">createSubject</span><span class="o">()</span> <span class="o">{</span>
+</span><span class="line">        <span class="k">return</span> <span class="k">new</span> <span class="nf">HelloWorldSubject</span><span class="o">();</span>
+</span><span class="line">    <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">    <span class="kd">public</span> <span class="n">Observer</span> <span class="nf">createObserver</span><span class="o">()</span> <span class="o">{</span>
+</span><span class="line">        <span class="k">return</span> <span class="k">new</span> <span class="nf">HelloWorldObserver</span><span class="o">();</span>
+</span><span class="line">    <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">    <span class="kd">public</span> <span class="n">Command</span> <span class="nf">createCommand</span><span class="o">(</span><span class="n">Subject</span> <span class="n">subject</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">        <span class="k">return</span> <span class="k">new</span> <span class="nf">HelloWorldCommand</span><span class="o">(</span><span class="n">subject</span><span class="o">);</span>
+</span><span class="line">    <span class="o">}</span>
+</span><span class="line"><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>再添加一个<strong>单例模式</strong>即大功告成。</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+</pre></td><td class="code"><pre><code class="java"><span class="line"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">FactoryMakerSingleton</span> <span class="o">{</span>
+</span><span class="line">
+</span><span class="line">    <span class="kd">private</span> <span class="kd">static</span> <span class="n">FactoryMakerSingleton</span> <span class="n">instance</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class="line">    <span class="kd">private</span> <span class="n">AbstractFactory</span> <span class="n">factory</span><span class="o">;</span>
+</span><span class="line">
+</span><span class="line">    <span class="kd">private</span> <span class="nf">FactoryMakerSingleton</span><span class="o">()</span> <span class="o">{</span>
+</span><span class="line">        <span class="n">factory</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HelloWorldFactory</span><span class="o">();</span>
+</span><span class="line">    <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">synchronized</span> <span class="n">FactoryMakerSingleton</span> <span class="nf">getInstance</span><span class="o">()</span> <span class="o">{</span>
+</span><span class="line">        <span class="k">if</span> <span class="o">(</span><span class="n">instance</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">            <span class="n">instance</span> <span class="o">=</span> <span class="k">new</span> <span class="n">FactoryMakerSingleton</span><span class="o">();</span>
+</span><span class="line">        <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">        <span class="k">return</span> <span class="n">instance</span><span class="o">;</span>
+</span><span class="line">    <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">    <span class="kd">public</span> <span class="n">AbstractFactory</span> <span class="nf">getFactory</span><span class="o">()</span> <span class="o">{</span>
+</span><span class="line">        <span class="k">return</span> <span class="n">factory</span><span class="o">;</span>
+</span><span class="line">    <span class="o">}</span>
+</span><span class="line"><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>最后编写一个主类（用作测试）。</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+</pre></td><td class="code"><pre><code class="java"><span class="line"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">AbuseDesignPatterns</span> <span class="o">{</span>
+</span><span class="line">
+</span><span class="line">    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">        <span class="n">AbstractFactory</span> <span class="n">factory</span> <span class="o">=</span> <span class="n">FactoryMakerSingleton</span><span class="o">.</span><span class="na">getInstance</span><span class="o">().</span><span class="na">getFactory</span><span class="o">();</span>
+</span><span class="line">
+</span><span class="line">        <span class="n">Subject</span> <span class="n">subject</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="na">createSubject</span><span class="o">();</span>
+</span><span class="line">        <span class="n">subject</span><span class="o">.</span><span class="na">attach</span><span class="o">(</span><span class="n">factory</span><span class="o">.</span><span class="na">createObserver</span><span class="o">());</span>
+</span><span class="line">
+</span><span class="line">        <span class="n">Command</span> <span class="n">command</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="na">createCommand</span><span class="o">(</span><span class="n">subject</span><span class="o">);</span>
+</span><span class="line">
+</span><span class="line">        <span class="n">command</span><span class="o">.</span><span class="na">execute</span><span class="o">();</span>
+</span><span class="line">    <span class="o">}</span>
+</span><span class="line">
+</span><span class="line"><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>程序运行输出： <code>Hello World</code></p>
+
+<p>哇，我们已经在<strong>Hello World</strong>程序中成功地运用四种模式。（嗯，其实还能添加一个迭代器模式，不过已经引用了内置的迭代器，Java中经常如此）。这必须是一个拿得出手的设计呀。那么问题出在哪儿呢？</p>
+
+<ol>
+  <li>对于一个<strong>Hello World</strong>程序而言代码过于复杂。</li>
+  <li>包含多余的灵活性。</li>
+  <li>设计和实现的时间成本是彻彻底底的浪费。</li>
+  <li>引发了类膨胀。</li>
+  <li>违反了KISS原则。<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup></li>
+  <li>没满足问题的要求。问题目的本在于学习打印标准输出，以上代码却缪以千里。</li>
+</ol>
+
+<h4 id="section">总结</h4>
+<p>设计模式应具体场景具体运用，不要为运用而运用。设计模式是构建大型软件的强大工具。应恰到好处，切忌滥用。</p>
+
+<p>从<a href="http://dl.dropbox.com/u/17612367/2011_09_21_abuse_design_patterns/AbuseDesignPatterns.zip">这儿</a>下载文中的代码。欢迎来函反馈。如果谁有办法在<strong>Hello World</strong>程序中堆砌更多设计模式，再好不过了。</p>
+
+<h4 id="section-1">参考文章</h4>
+<div class="footnotes">
+  <ol>
+    <li id="fn:1">
+      <p><a href="http://www.artima.com/lejava/articles/gammadp.html">如何运用设计模式</a><a href="#fnref:1" rel="reference">&#8617;</a></p>
+    </li>
+    <li id="fn:2">
+      <p>第13章：现实世界中的模式<a href="http://www.amazon.com/First-Design-Patterns-Elisabeth-Freeman/dp/0596007124">Head First设计模式</a><a href="#fnref:2" rel="reference">&#8617;</a></p>
+    </li>
+    <li id="fn:3">
+      <p><a href="http://en.wikipedia.org/wiki/KISS_principle">KISS原则</a><a href="#fnref:3" rel="reference">&#8617;</a></p>
+    </li>
+  </ol>
+</div>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/04/21/hello/">Hello, Octopress</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+
+<time datetime="2014-04-21T18:04:00+08:00" pubdate data-updated="true">Apr 21<span>st</span>, 2014</time>
+        
+         | <a href="/blog/2014/04/21/hello/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3 id="section">代码高亮测试</h3>
+
+<p>c</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>七段码显示</span><a href="http://www.ioccc.org/2006/sykes2/sykes2.c">代码链接</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="c"><span class="line"><span class="n">main</span><span class="p">(</span><span class="n">_</span><span class="p">){</span><span class="n">_</span><span class="o">^</span><span class="mi">448</span><span class="o">&amp;&amp;</span><span class="n">main</span><span class="p">(</span><span class="o">-~</span><span class="n">_</span><span class="p">);</span><span class="n">putchar</span><span class="p">(</span><span class="o">--</span><span class="n">_</span><span class="o">%</span><span class="mi">64</span><span class="o">?</span><span class="mi">32</span><span class="o">|-~</span><span class="mi">7</span><span class="p">[</span><span class="n">__TIME__</span><span class="o">-</span><span class="n">_</span><span class="o">/</span><span class="mi">8</span><span class="o">%</span><span class="mi">8</span><span class="p">][</span><span class="s">&quot;&gt;&#39;txiZ^(~z?&quot;</span><span class="o">-</span><span class="mi">48</span><span class="p">]</span><span class="o">&gt;&gt;</span><span class="s">&quot;;;;====~$::199&quot;</span><span class="p">[</span><span class="n">_</span><span class="o">*</span><span class="mi">2</span><span class="o">&amp;</span><span class="mi">8</span><span class="o">|</span><span class="n">_</span><span class="o">/</span><span class="mi">64</span><span class="p">]</span><span class="o">/</span><span class="p">(</span><span class="n">_</span><span class="o">&amp;</span><span class="mi">2</span><span class="o">?</span><span class="mi">1</span><span class="o">:</span><span class="mi">8</span><span class="p">)</span><span class="o">%</span><span class="mi">8</span><span class="o">&amp;</span><span class="mi">1</span><span class="o">:</span><span class="mi">10</span><span class="p">);}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>ruby</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>Discover if a number is prime</span><a href="http://www.noulakaz.net/weblog/2007/03/18/a-regular-expression-to-check-for-prime-numbers/">Source Article</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">Fixnum</span>
+</span><span class="line">  <span class="k">def</span> <span class="nf">prime?</span>
+</span><span class="line">    <span class="p">(</span><span class="s1">&#39;1&#39;</span> <span class="o">*</span> <span class="nb">self</span><span class="p">)</span> <span class="o">!~</span> <span class="sr">/^1?$|^(11+?)\1+$/</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h3 id="latex">Latex数学公式测试</h3>
+
+<p>行内公式$\exp(-\frac{x^2}{2})$测试</p>
+
+<p>公式测试一</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+
+\begin{align*}
+  & \phi(x,y) = \phi \left(\sum_{i=1}^n x_ie_i, \sum_{j=1}^n y_je_j \right)
+  = \sum_{i=1}^n \sum_{j=1}^n x_i y_j \phi(e_i, e_j) = \\
+  & (x_1, \ldots, x_n) \left( \begin{array}{ccc}
+      \phi(e_1, e_1) & \cdots & \phi(e_1, e_n) \\
+      \vdots & \ddots & \vdots \\
+      \phi(e_n, e_1) & \cdots & \phi(e_n, e_n)
+    \end{array} \right)
+  \left( \begin{array}{c}
+      y_1 \\
+      \vdots \\
+      y_n
+    \end{array} \right)
+\end{align*}
+ %]]></script>
+
+<p>公式测试二</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+
+\begin{align}
+\mbox{Union: } & A\cup B = \{x\mid x\in A \mbox{ or } x\in B\} \\
+\mbox{Concatenation: } & A\circ B  = \{xy\mid x\in A \mbox{ and } y\in B\} \\
+\mbox{Star: } & A^\star  = \{x_1x_2\ldots x_k \mid  k\geq 0 \mbox{ and each } x_i\in A\} \\
+\end{align}
+ %]]></script>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>关于我</h1>
+  <p>一位有匠心的手艺人和他的生活方式</p>
+</section>
+<section>
+  <h1>分类</h1>
+    <ul id="category-list"><li><a href='/blog/categories/algorithm'>Algorithm (2)</a></li><li><a href='/blog/categories/miscs'>miscs (1)</a></li></ul>
+</section>
+<section>
+  <h1>标签</h1>
+  <ul class="tag-cloud">
+<a style="font-size: 165%" href="/tags/algorithm/">algorithm</a>&nbsp
+<a style="font-size: 60%" href="/tags/design-pattern/">design pattern</a>&nbsp
+<a style="font-size: 60%" href="/tags/java/">java</a>&nbsp
+<a style="font-size: 165%" href="/tags/maths/">maths</a>
+
+  </ul>
+</section>
+<section>
+  <h1>最新文章</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/07/14/fast-inverse-square-root/">快速平方根倒数算法</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/05/03/fast-fibonacci/">[译]快速斐波那契算法</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/04/27/the-abuse-of-design-patterns-in-writing-a-hello-world-program/">[译]设计模式滥用之Hello World</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/04/21/hello/">Hello, Octopress</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  版权所有 &copy; 2014 - bingo -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'guevara';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

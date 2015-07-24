@@ -1,0 +1,35 @@
+<div class="highlight"><pre><span class="err">@</span><span class="nl">todo:</span> <span class="err">与</span><span class="mi">1</span><span class="o">/</span><span class="n">sqrt</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="err">比较</span>
+
+<span class="err">动机：</span>
+
+<span class="err">向量</span>
+
+<span class="mi">2</span> <span class="err">算法分析</span><span class="p">[</span><span class="o">^</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="err">算法的核心在于确定一个合适的近似迭代初值，通过有限次牛顿逼近得到精度允许的结果。</span>
+
+<span class="mf">2.1</span> <span class="err">牛顿法</span><span class="p">(</span><span class="o">**</span><span class="n">Newton</span><span class="o">-</span><span class="n">Raphson</span> <span class="n">Method</span><span class="o">**</span><span class="p">)</span>
+
+<span class="err">@</span><span class="n">insert</span> <span class="n">gif</span><span class="err">动画</span>
+
+<span class="err">已知浮点数$$</span><span class="n">x</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="err">$$，欲计算$$</span><span class="n">y</span> <span class="o">=</span> <span class="p">{</span><span class="err">\</span><span class="n">sqrt</span> <span class="n">x</span><span class="p">}</span><span class="err">$$，定义函数$$</span><span class="n">f</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">=</span> <span class="err">\</span><span class="n">frac</span><span class="p">{</span><span class="mi">1</span><span class="p">}{</span><span class="n">y</span><span class="o">^</span><span class="mi">2</span><span class="p">}</span> <span class="o">-</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">0</span><span class="err">$$，问题转换为求$$</span><span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="err">$$的正数根。</span>
+<span class="err">代入迭代公式</span>
+
+<span class="err">$$</span>
+<span class="n">y_</span><span class="p">{</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">}</span> <span class="o">=</span> <span class="n">y_</span><span class="p">{</span><span class="n">n</span><span class="p">}</span> <span class="o">-</span> <span class="err">\</span><span class="n">frac</span><span class="p">{</span><span class="n">f</span><span class="p">(</span><span class="n">y_n</span><span class="p">)}{</span><span class="n">f</span><span class="err">&#39;</span><span class="p">(</span><span class="n">y_n</span><span class="p">)}</span>
+<span class="err">$$</span>
+
+<span class="err">有</span>
+
+<span class="err">$$</span>
+<span class="n">y_</span><span class="p">{</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">}</span> <span class="o">=</span> <span class="err">\</span><span class="n">frac</span><span class="p">{</span><span class="n">y_</span><span class="p">{</span><span class="n">n</span><span class="p">}(</span><span class="mi">3</span><span class="o">-</span><span class="n">xy_n</span><span class="o">^</span><span class="mi">2</span><span class="p">)}{</span><span class="mi">2</span><span class="p">}</span> <span class="err">\</span><span class="n">label</span><span class="p">{</span><span class="nl">eq:</span><span class="n">ref10</span><span class="p">}</span>
+<span class="err">$$</span>
+
+<span class="err">，其中$$</span><span class="n">f</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="o">=</span><span class="err">\</span><span class="n">frac</span><span class="p">{</span><span class="mi">1</span><span class="p">}{</span><span class="n">y</span><span class="o">^</span><span class="mi">2</span><span class="p">}</span><span class="o">-</span><span class="n">x</span><span class="err">$$，$$</span><span class="n">f</span><span class="err">&#39;</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="o">=</span><span class="err">\</span><span class="n">frac</span><span class="p">{</span><span class="o">-</span><span class="mi">2</span><span class="p">}{</span><span class="n">y</span><span class="o">^</span><span class="mi">3</span><span class="p">}</span><span class="err">$$。整理$$\</span><span class="n">eqref</span><span class="p">{</span><span class="nl">eq:</span><span class="n">ref10</span><span class="p">}</span><span class="err">$$得</span>
+
+<span class="err">$$</span>
+<span class="n">y_</span><span class="p">{</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">}</span> <span class="o">=</span> <span class="err">\</span><span class="n">frac</span><span class="p">{</span><span class="n">y_</span><span class="p">{</span><span class="n">n</span><span class="p">}(</span><span class="mi">3</span><span class="o">-</span><span class="n">xy_n</span><span class="o">^</span><span class="mi">2</span><span class="p">)}{</span><span class="mi">2</span><span class="p">}</span> <span class="o">=</span> <span class="n">y_</span><span class="p">{</span><span class="n">n</span><span class="p">}(</span><span class="mf">1.5</span><span class="o">-</span><span class="err">\</span><span class="n">frac</span><span class="p">{</span><span class="n">xy_n</span><span class="o">^</span><span class="mi">2</span><span class="p">}{</span><span class="mi">2</span><span class="p">})</span>
+<span class="err">$$</span>
+
+<span class="err">，迭代一次即代码第</span><span class="mi">12</span><span class="err">行</span>
+</pre></div>

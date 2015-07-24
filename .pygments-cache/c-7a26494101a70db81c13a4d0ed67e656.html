@@ -1,0 +1,49 @@
+<div class="highlight"><pre><span class="cp">#define BYTE_COPY_FWD(dst_bp, src_bp, nbytes)      </span>
+<span class="k">do</span>                                        \
+    <span class="p">{</span>                                         \
+      <span class="k">if</span> <span class="p">(</span><span class="n">src_bp</span> <span class="o">%</span> <span class="n">OPSIZ</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>                            \
+    <span class="n">_wordcopy_fwd_aligned</span> <span class="p">(</span><span class="n">dst_bp</span><span class="p">,</span> <span class="n">src_bp</span><span class="p">,</span> <span class="p">(</span><span class="n">nbytes</span><span class="p">)</span> <span class="o">/</span> <span class="n">OPSIZ</span><span class="p">);</span>        \
+      <span class="k">else</span>                                    \
+    <span class="n">_wordcopy_fwd_dest_aligned</span> <span class="p">(</span><span class="n">dst_bp</span><span class="p">,</span> <span class="n">src_bp</span><span class="p">,</span> <span class="p">(</span><span class="n">nbytes</span><span class="p">)</span> <span class="o">/</span> <span class="n">OPSIZ</span><span class="p">);</span>       \
+      <span class="n">src_bp</span> <span class="o">+=</span> <span class="p">(</span><span class="n">nbytes</span><span class="p">)</span> <span class="o">&amp;</span> <span class="o">-</span><span class="n">OPSIZ</span><span class="p">;</span>                        \
+      <span class="n">dst_bp</span> <span class="o">+=</span> <span class="p">(</span><span class="n">nbytes</span><span class="p">)</span> <span class="o">&amp;</span> <span class="o">-</span><span class="n">OPSIZ</span><span class="p">;</span>                        \
+      <span class="p">(</span><span class="n">nbytes_left</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="n">nbytes</span><span class="p">)</span> <span class="o">%</span> <span class="n">OPSIZ</span><span class="p">;</span>                       \
+    <span class="p">}</span> <span class="k">while</span> <span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="kt">void</span> <span class="o">*</span>
+<span class="n">memcpy</span> <span class="p">(</span><span class="n">dstpp</span><span class="p">,</span> <span class="n">srcpp</span><span class="p">,</span> <span class="n">len</span><span class="p">)</span>
+     <span class="kt">void</span> <span class="o">*</span><span class="n">dstpp</span><span class="p">;</span>
+     <span class="k">const</span> <span class="kt">void</span> <span class="o">*</span><span class="n">srcpp</span><span class="p">;</span>
+     <span class="kt">size_t</span> <span class="n">len</span><span class="p">;</span>
+<span class="p">{</span>
+  <span class="kt">unsigned</span> <span class="kt">long</span> <span class="kt">int</span> <span class="n">dstp</span> <span class="o">=</span> <span class="p">(</span><span class="kt">long</span> <span class="kt">int</span><span class="p">)</span> <span class="n">dstpp</span><span class="p">;</span>
+  <span class="kt">unsigned</span> <span class="kt">long</span> <span class="kt">int</span> <span class="n">srcp</span> <span class="o">=</span> <span class="p">(</span><span class="kt">long</span> <span class="kt">int</span><span class="p">)</span> <span class="n">srcpp</span><span class="p">;</span>
+
+  <span class="cm">/* Copy from the beginning to the end.  */</span>
+
+  <span class="cm">/* If there not too few bytes to copy, use word copy.  */</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">len</span> <span class="o">&gt;=</span> <span class="n">OP_T_THRES</span><span class="p">)</span>
+    <span class="p">{</span>
+      <span class="cm">/* Copy just a few bytes to make DSTP aligned.  */</span>
+      <span class="n">len</span> <span class="o">-=</span> <span class="p">(</span><span class="o">-</span><span class="n">dstp</span><span class="p">)</span> <span class="o">%</span> <span class="n">OPSIZ</span><span class="p">;</span>
+      <span class="n">BYTE_COPY_FWD</span> <span class="p">(</span><span class="n">dstp</span><span class="p">,</span> <span class="n">srcp</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="n">dstp</span><span class="p">)</span> <span class="o">%</span> <span class="n">OPSIZ</span><span class="p">);</span>
+
+      <span class="cm">/* Copy whole pages from SRCP to DSTP by virtual address manipulation,</span>
+<span class="cm">     as much as possible.  */</span>
+
+      <span class="n">PAGE_COPY_FWD_MAYBE</span> <span class="p">(</span><span class="n">dstp</span><span class="p">,</span> <span class="n">srcp</span><span class="p">,</span> <span class="n">len</span><span class="p">,</span> <span class="n">len</span><span class="p">);</span>
+
+      <span class="cm">/* Copy from SRCP to DSTP taking advantage of the known alignment of</span>
+<span class="cm">     DSTP.  Number of bytes remaining is put in the third argument,</span>
+<span class="cm">     i.e. in LEN.  This number may vary from machine to machine.  */</span>
+
+      <span class="n">WORD_COPY_FWD</span> <span class="p">(</span><span class="n">dstp</span><span class="p">,</span> <span class="n">srcp</span><span class="p">,</span> <span class="n">len</span><span class="p">,</span> <span class="n">len</span><span class="p">);</span>
+
+      <span class="cm">/* Fall out and copy the tail.  */</span>
+    <span class="p">}</span>
+
+  <span class="cm">/* There are just a few bytes to copy.  Use byte memory operations.  */</span>
+  <span class="n">BYTE_COPY_FWD</span> <span class="p">(</span><span class="n">dstp</span><span class="p">,</span> <span class="n">srcp</span><span class="p">,</span> <span class="n">len</span><span class="p">);</span>
+
+  <span class="k">return</span> <span class="n">dstpp</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>

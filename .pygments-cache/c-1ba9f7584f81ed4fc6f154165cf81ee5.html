@@ -1,0 +1,25 @@
+<div class="highlight"><pre><span class="kt">uint64_t</span> <span class="nf">fibo_expo_var_2</span><span class="p">(</span><span class="kt">uint64_t</span> <span class="n">n</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">uint64_t</span> <span class="n">a_t</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">b_t</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="c1">// &quot;1&quot;</span>
+            <span class="n">a_y</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">b_y</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="c1">// &quot;y&quot;</span>
+
+    <span class="k">while</span> <span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="c1">// t*=y;</span>
+            <span class="kt">uint64_t</span> <span class="n">bx</span> <span class="o">=</span> <span class="n">b_t</span> <span class="o">*</span> <span class="n">b_y</span><span class="p">;</span>
+            <span class="n">b_t</span> <span class="o">=</span> <span class="n">a_t</span> <span class="o">*</span> <span class="n">b_y</span> <span class="o">+</span> <span class="n">b_t</span> <span class="o">*</span> <span class="n">a_y</span> <span class="o">+</span> <span class="n">bx</span><span class="p">;</span>
+            <span class="n">a_t</span> <span class="o">=</span> <span class="n">a_t</span> <span class="o">*</span> <span class="n">a_y</span> <span class="o">+</span> <span class="n">bx</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="c1">//y*=y;</span>
+        <span class="kt">uint64_t</span> <span class="n">b2</span> <span class="o">=</span> <span class="n">b_y</span> <span class="o">*</span> <span class="n">b_y</span><span class="p">;</span>
+        <span class="n">b_y</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">a_y</span> <span class="o">*</span> <span class="n">b_y</span> <span class="o">+</span> <span class="n">b2</span><span class="p">;</span>
+        <span class="n">a_y</span> <span class="o">=</span> <span class="n">a_y</span> <span class="o">*</span> <span class="n">a_y</span> <span class="o">+</span> <span class="n">b2</span><span class="p">;</span>
+
+        <span class="n">n</span> <span class="o">&gt;&gt;=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">b_t</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>

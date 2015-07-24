@@ -1,0 +1,21 @@
+<div class="highlight"><pre><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">AbstractFactory</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="n">Subject</span> <span class="nf">createSubject</span><span class="o">();</span>
+    <span class="kd">public</span> <span class="n">Observer</span> <span class="nf">createObserver</span><span class="o">();</span>
+    <span class="kd">public</span> <span class="n">Command</span> <span class="nf">createCommand</span><span class="o">(</span><span class="n">Subject</span> <span class="n">subject</span><span class="o">);</span>
+<span class="o">}</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">HelloWorldFactory</span> <span class="kd">implements</span> <span class="n">AbstractFactory</span> <span class="o">{</span>
+
+    <span class="kd">public</span> <span class="n">Subject</span> <span class="nf">createSubject</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nf">HelloWorldSubject</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="n">Observer</span> <span class="nf">createObserver</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nf">HelloWorldObserver</span><span class="o">();</span> 
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="n">Command</span> <span class="nf">createCommand</span><span class="o">(</span><span class="n">Subject</span> <span class="n">subject</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nf">HelloWorldCommand</span><span class="o">(</span><span class="n">subject</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>

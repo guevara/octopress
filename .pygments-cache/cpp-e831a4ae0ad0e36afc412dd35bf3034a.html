@@ -1,0 +1,134 @@
+<div class="highlight"><pre><span class="err">@</span><span class="n">insert</span> <span class="n">image</span>
+
+
+
+<span class="mf">2.2</span> <span class="err">确定初值</span><span class="p">(</span><span class="err">@</span><span class="nl">footnote:</span> <span class="err">此部分来自</span><span class="n">MC</span><span class="p">)</span>
+
+<span class="err">接下需要确定迭代公式的近似初值$$</span><span class="n">y_</span><span class="p">{</span><span class="mi">0</span><span class="p">}</span><span class="err">$$。</span>
+
+<span class="mi">32</span><span class="err">位浮点数</span>
+
+<span class="err">规格化</span>
+
+<span class="mf">1.</span> <span class="err">隐藏位</span>
+<span class="mf">2.</span> <span class="err">移码</span>
+
+<span class="err">浮点数</span><span class="n">IEEE754</span><span class="err">的标准格式</span>
+
+<span class="o">&lt;</span><span class="n">table</span><span class="o">&gt;</span>
+    <span class="o">&lt;</span><span class="n">tbody</span><span class="o">&gt;</span>
+        <span class="o">&lt;</span><span class="n">tr</span><span class="o">&gt;</span>
+            <span class="o">&lt;</span><span class="n">th</span><span class="o">&gt;&lt;</span><span class="n">small</span><span class="o">&gt;</span><span class="n">S</span><span class="p">(</span><span class="n">ign</span><span class="p">,</span><span class="err">符号</span><span class="p">)</span><span class="o">&lt;/</span><span class="n">small</span><span class="o">&gt;&lt;/</span><span class="n">th</span><span class="o">&gt;</span>
+            <span class="o">&lt;</span><span class="n">th</span><span class="o">&gt;&lt;</span><span class="n">small</span><span class="o">&gt;</span><span class="n">E</span><span class="p">(</span><span class="n">xponent</span><span class="p">,</span><span class="err">指数</span><span class="p">)</span><span class="o">&lt;/</span><span class="n">small</span><span class="o">&gt;&lt;/</span><span class="n">th</span><span class="o">&gt;</span>
+            <span class="o">&lt;</span><span class="n">th</span><span class="o">&gt;&lt;</span><span class="n">small</span><span class="o">&gt;</span><span class="n">M</span><span class="p">(</span><span class="n">antissa</span><span class="p">,</span><span class="err">尾数</span><span class="p">)</span><span class="o">&lt;/</span><span class="n">small</span><span class="o">&gt;&lt;/</span><span class="n">th</span><span class="o">&gt;</span>
+        <span class="o">&lt;/</span><span class="n">tr</span><span class="o">&gt;</span>
+        <span class="o">&lt;</span><span class="n">tr</span> <span class="n">style</span><span class="o">=</span><span class="s">&quot;text-align:center;&quot;</span><span class="o">&gt;</span>
+            <span class="o">&lt;</span><span class="n">td</span><span class="o">&gt;</span><span class="mi">1</span> <span class="n">bit</span><span class="o">&lt;/</span><span class="n">td</span><span class="o">&gt;</span>
+            <span class="o">&lt;</span><span class="n">td</span><span class="o">&gt;</span><span class="n">b</span> <span class="n">bits</span><span class="o">&lt;/</span><span class="n">td</span><span class="o">&gt;</span>
+            <span class="o">&lt;</span><span class="n">td</span><span class="o">&gt;&lt;</span><span class="n">tt</span><span class="o">&gt;</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="o">-</span><span class="n">b</span><span class="p">)</span><span class="o">&lt;/</span><span class="n">tt</span><span class="o">&gt;</span><span class="n">bits</span><span class="o">&lt;/</span><span class="n">td</span><span class="o">&gt;</span>
+        <span class="o">&lt;/</span><span class="n">tr</span><span class="o">&gt;</span>
+        <span class="o">&lt;</span><span class="n">tr</span><span class="o">&gt;</span>
+            <span class="o">&lt;</span><span class="n">td</span> <span class="n">colspan</span><span class="o">=</span><span class="s">&quot;3&quot;</span> <span class="n">style</span><span class="o">=</span><span class="s">&quot;text-align:center;&quot;</span><span class="o">&gt;</span><span class="n">n</span> <span class="n">bits</span><span class="o">&lt;/</span><span class="n">td</span><span class="o">&gt;</span>
+        <span class="o">&lt;/</span><span class="n">tr</span><span class="o">&gt;</span>
+    <span class="o">&lt;/</span><span class="n">tbody</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">table</span><span class="o">&gt;</span>
+
+
+
+<span class="err">背景知识</span>
+
+<span class="err">@</span><span class="nl">todo:</span> <span class="err">示例</span>
+
+<span class="err">已知</span><span class="mi">32</span><span class="err">位浮点数</span><span class="n">IEEE</span><span class="o">-</span><span class="mi">754</span><span class="err">二进制表示形式</span>
+
+<span class="o">|</span> <span class="n">S</span><span class="p">(</span><span class="n">ign</span><span class="p">)</span> <span class="o">|</span> <span class="n">E</span><span class="p">(</span><span class="n">xponent</span><span class="p">)</span> <span class="o">|</span> <span class="n">M</span><span class="p">(</span><span class="n">antissa</span><span class="p">)</span> <span class="o">|</span>
+<span class="o">|</span>     <span class="mi">1</span> <span class="n">bit</span>     <span class="o">|</span> <span class="mi">8</span> <span class="n">bits</span> <span class="o">|</span> <span class="mi">23</span> <span class="n">bits</span> <span class="o">|</span>
+<span class="o">|</span><span class="n">bit</span> <span class="mi">31</span> <span class="o">|</span> <span class="mi">30</span> <span class="o">&amp;</span><span class="err">#</span><span class="mi">8592</span><span class="p">;</span> <span class="n">bits</span> <span class="o">&amp;</span><span class="err">#</span><span class="mi">8594</span><span class="p">;</span> <span class="mi">23</span><span class="o">|</span> <span class="mi">30</span> <span class="o">&amp;</span><span class="err">#</span><span class="mi">8592</span><span class="p">;</span> <span class="n">bits</span> <span class="o">&amp;</span><span class="err">#</span><span class="mi">8594</span><span class="p">;</span> <span class="mi">23</span><span class="o">|</span> 
+
+<span class="err">其中`</span><span class="n">S</span><span class="err">`为符号位，`</span><span class="n">E</span><span class="err">`为经过偏移的</span><span class="mi">8</span><span class="err">位指数，剩下</span><span class="mi">23</span><span class="err">位为尾数`</span><span class="n">M</span><span class="err">`。浮点数值则表示成</span>
+
+<span class="err">$$</span>
+<span class="n">x</span> <span class="o">=</span> <span class="p">{</span><span class="err">\</span><span class="n">left</span><span class="p">(</span> <span class="p">{</span> <span class="o">-</span> <span class="mi">1</span><span class="p">}</span> <span class="err">\</span><span class="n">right</span><span class="p">)</span><span class="o">^</span><span class="n">S</span><span class="p">}</span><span class="err">\</span><span class="n">left</span><span class="p">(</span> <span class="p">{</span><span class="mf">1.</span><span class="n">M</span><span class="p">}</span> <span class="err">\</span><span class="n">right</span><span class="p">){</span><span class="mi">2</span><span class="o">^</span><span class="p">{</span><span class="n">E</span> <span class="o">-</span> <span class="n">B</span><span class="p">}}</span>
+<span class="err">$$</span>
+
+<span class="err">对应整数值</span>
+
+<span class="err">$$</span>
+<span class="n">I</span> <span class="o">=</span> <span class="n">S</span> <span class="err">\</span><span class="n">cdot</span> <span class="p">{</span><span class="mi">2</span><span class="o">^</span><span class="p">{</span><span class="mi">31</span><span class="p">}}</span> <span class="o">+</span> <span class="n">E</span> <span class="err">\</span><span class="n">cdot</span> <span class="p">{</span><span class="mi">2</span><span class="o">^</span><span class="p">{</span><span class="mi">23</span><span class="p">}}</span> <span class="o">+</span> <span class="n">M</span>
+<span class="err">$$</span>
+
+<span class="err">$$</span><span class="n">m</span><span class="err">$$和$$</span><span class="n">M</span><span class="err">$$，$$</span><span class="n">e</span><span class="err">$$和$$</span><span class="n">E</span><span class="err">$$之间具有转换关系</span>
+
+<span class="err">$$</span>
+<span class="err">\</span><span class="n">left</span><span class="err">\</span><span class="p">{</span>
+<span class="err">\</span><span class="n">begin</span><span class="p">{</span><span class="n">array</span><span class="p">}{</span><span class="n">c</span><span class="p">}</span>
+<span class="n">m</span> <span class="o">=</span> <span class="err">\</span><span class="n">frac</span><span class="p">{</span><span class="n">M</span><span class="p">}{</span><span class="n">L</span><span class="p">},</span> <span class="n">m</span> <span class="err">\</span><span class="n">in</span> <span class="err">\</span><span class="n">left</span><span class="p">[</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span> <span class="err">\</span><span class="n">right</span> <span class="p">)</span> <span class="err">\</span>\
+<span class="n">e</span> <span class="o">=</span> <span class="n">E</span> <span class="o">-</span> <span class="n">B</span>
+<span class="err">\</span><span class="n">end</span><span class="p">{</span><span class="n">array</span><span class="p">}</span>
+<span class="err">\</span><span class="n">right</span><span class="p">.</span>
+<span class="err">$$</span>
+
+<span class="err">其中偏移量$$</span><span class="n">B</span> <span class="o">=</span> <span class="mi">2</span><span class="o">^</span><span class="p">{</span><span class="n">b</span><span class="o">-</span><span class="mi">1</span><span class="p">}</span> <span class="o">-</span> <span class="mi">1</span><span class="err">$$</span><span class="p">,</span> <span class="err">基底$$</span><span class="n">L</span> <span class="o">=</span> <span class="mi">2</span><span class="o">^</span><span class="p">{</span><span class="n">n</span><span class="o">-</span><span class="n">b</span><span class="o">-</span><span class="mi">1</span><span class="p">}</span><span class="err">$$。对于</span><span class="mi">32</span><span class="err">位浮点数，$$</span><span class="n">B</span> <span class="o">=</span> <span class="mi">2</span><span class="o">^</span><span class="p">{</span><span class="mi">7</span><span class="p">}</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">=</span> <span class="mi">127</span><span class="err">$$，$$</span><span class="n">L</span> <span class="o">=</span> <span class="mi">2</span><span class="o">^</span><span class="p">{</span><span class="mi">23</span><span class="p">}</span> <span class="err">$$。</span>
+
+<span class="err">相应地推广至具有</span><span class="n">b</span><span class="err">位指数的</span><span class="n">n</span><span class="err">位二进制浮点数</span><span class="p">,</span> <span class="err">$$</span><span class="n">x</span><span class="err">$$和$$</span><span class="n">I_x</span><span class="err">$$分别为</span>
+
+<span class="err">$$</span>
+<span class="err">\</span><span class="n">left</span><span class="err">\</span><span class="p">{</span>
+<span class="err">\</span><span class="n">begin</span><span class="p">{</span><span class="n">array</span><span class="p">}{</span><span class="n">c</span><span class="p">}</span>
+<span class="n">x</span> <span class="o">=</span> <span class="err">\</span><span class="n">left</span><span class="p">(</span> <span class="p">{</span><span class="mi">1</span> <span class="o">+</span> <span class="p">{</span><span class="n">m_x</span><span class="p">}}</span> <span class="err">\</span><span class="n">right</span><span class="p">)</span><span class="mi">2</span><span class="o">^</span><span class="p">{</span><span class="n">e_x</span><span class="p">}</span><span class="err">\</span>\
+<span class="p">{</span><span class="n">I_x</span><span class="p">}</span> <span class="o">=</span> <span class="p">{</span><span class="n">E_x</span><span class="p">}</span><span class="n">L</span> <span class="o">+</span> <span class="p">{</span><span class="n">M_x</span><span class="p">}</span>
+<span class="err">\</span><span class="n">end</span><span class="p">{</span><span class="n">array</span><span class="p">}</span>
+<span class="err">\</span><span class="n">right</span><span class="p">.</span>
+<span class="err">$$</span>
+
+
+<span class="err">对于给定参数$$</span><span class="n">x</span><span class="err">$$，其平方根倒数为</span>
+
+<span class="err">$$</span>
+<span class="n">y</span> <span class="o">=</span> <span class="err">\</span><span class="n">frac</span><span class="p">{</span><span class="mi">1</span><span class="p">}{</span><span class="err">\</span><span class="n">sqrt</span> <span class="n">x</span> <span class="p">}</span> <span class="o">=</span> <span class="n">x</span><span class="o">^</span><span class="p">{</span><span class="o">-</span><span class="err">\</span><span class="n">frac</span><span class="p">{</span><span class="mi">1</span><span class="p">}{</span><span class="mi">2</span><span class="p">}}</span>
+<span class="err">$$</span>
+
+<span class="err">等式两边同时取基底</span><span class="mi">2</span><span class="err">的对数，</span>
+
+<span class="err">$$</span>
+<span class="p">{</span><span class="err">\</span><span class="n">log</span> <span class="n">_2</span><span class="p">}</span><span class="n">y</span> <span class="o">=</span>  <span class="o">-</span> <span class="err">\</span><span class="n">frac</span><span class="p">{</span><span class="mi">1</span><span class="p">}{</span><span class="mi">2</span><span class="p">}{</span><span class="err">\</span><span class="n">log</span> <span class="n">_2</span><span class="p">}</span><span class="n">x</span>
+<span class="err">$$</span>
+
+<span class="err">代入$$</span><span class="n">x</span><span class="err">$$和$$</span><span class="n">y</span><span class="err">$$的浮点形式，</span>
+
+<span class="err">$$</span>
+<span class="p">{</span><span class="err">\</span><span class="n">log</span> <span class="n">_2</span><span class="p">}</span><span class="err">\</span><span class="n">left</span><span class="p">(</span> <span class="p">{</span><span class="mi">1</span> <span class="o">+</span> <span class="p">{</span><span class="n">m_y</span><span class="p">}}</span> <span class="err">\</span><span class="n">right</span><span class="p">)</span> <span class="o">=</span>  <span class="o">-</span> <span class="err">\</span><span class="n">frac</span><span class="p">{</span><span class="mi">1</span><span class="p">}{</span><span class="mi">2</span><span class="p">}{</span><span class="err">\</span><span class="n">log</span> <span class="n">_2</span><span class="p">}</span><span class="err">\</span><span class="n">left</span><span class="p">(</span> <span class="p">{</span><span class="mi">1</span> <span class="o">+</span> <span class="p">{</span><span class="n">m_x</span><span class="p">}}</span> <span class="err">\</span><span class="n">right</span><span class="p">)</span> <span class="o">-</span> <span class="err">\</span><span class="n">frac</span><span class="p">{</span><span class="mi">1</span><span class="p">}{</span><span class="mi">2</span><span class="p">}{</span><span class="n">e_x</span><span class="p">}</span>
+<span class="err">$$</span>
+
+<span class="err">两边具有同类项</span>
+
+<span class="err">$$\</span><span class="n">log</span> <span class="err">\</span><span class="n">left</span><span class="p">(</span> <span class="p">{</span><span class="mi">1</span> <span class="o">+</span> <span class="n">x</span><span class="p">}</span> <span class="err">\</span><span class="n">right</span> <span class="p">)</span> <span class="err">$$</span>
+
+<span class="err">已知当$$</span><span class="mi">0</span> <span class="err">\</span><span class="n">le</span> <span class="n">x</span> <span class="err">\</span><span class="n">le</span> <span class="mi">1</span><span class="err">$$，有$$\</span><span class="n">log</span> <span class="err">\</span><span class="n">left</span><span class="p">(</span> <span class="p">{</span><span class="mi">1</span> <span class="o">+</span> <span class="n">x</span><span class="p">}</span> <span class="err">\</span><span class="n">right</span> <span class="p">)</span> <span class="err">\</span><span class="n">approx</span> <span class="n">x</span> <span class="err">$$。令$$</span><span class="p">{</span><span class="err">\</span><span class="n">log</span> <span class="n">_2</span><span class="p">}</span> <span class="err">\</span><span class="n">left</span><span class="p">(</span> <span class="p">{</span><span class="mi">1</span> <span class="o">+</span> <span class="n">x</span><span class="p">}</span> <span class="err">\</span><span class="n">right</span><span class="p">)</span> <span class="err">\</span><span class="n">cong</span> <span class="n">x</span> <span class="o">+</span> <span class="err">\</span><span class="n">sigma</span><span class="err">$$，</span>
+<span class="err">$$\</span><span class="n">sigma</span><span class="err">$$为某个常量</span><span class="p">(</span><span class="err">事实上两端不尽相同</span><span class="p">)</span><span class="err">。这样上式可以简化成线性形式</span>
+
+<span class="err">$$</span>
+<span class="p">{</span><span class="n">m_x</span><span class="p">}</span> <span class="o">+</span> <span class="err">\</span><span class="n">sigma</span>  <span class="o">+</span> <span class="p">{</span><span class="n">e_y</span><span class="p">}</span> <span class="err">\</span><span class="n">approx</span>  <span class="o">-</span> <span class="err">\</span><span class="n">frac</span><span class="p">{</span><span class="mi">1</span><span class="p">}{</span><span class="mi">2</span><span class="p">}</span><span class="err">\</span><span class="n">left</span><span class="p">(</span> <span class="p">{</span><span class="n">m_x</span><span class="p">}</span> <span class="o">+</span> <span class="err">\</span><span class="n">sigma</span>  <span class="o">+</span> <span class="p">{</span><span class="n">e_x</span><span class="p">}</span> <span class="err">\</span><span class="n">right</span><span class="p">)</span>
+<span class="err">$$</span>
+
+<span class="err">代入</span>
+
+<span class="err">$$</span>
+<span class="err">\</span><span class="n">begin</span><span class="p">{</span><span class="n">array</span><span class="p">}{</span><span class="n">l</span><span class="p">}</span>
+<span class="err">\</span><span class="n">frac</span><span class="p">{</span><span class="n">M_y</span><span class="p">}{</span><span class="n">L</span><span class="p">}</span> <span class="o">+</span> <span class="err">\</span><span class="n">sigma</span>  <span class="o">+</span> <span class="p">{</span><span class="n">E_y</span><span class="p">}</span> <span class="o">-</span> <span class="n">B</span> <span class="err">\</span><span class="n">approx</span>  <span class="o">-</span> <span class="err">\</span><span class="n">frac</span><span class="p">{</span><span class="mi">1</span><span class="p">}{</span><span class="mi">2</span><span class="p">}</span><span class="err">\</span><span class="n">left</span><span class="p">(</span> <span class="p">{</span><span class="err">\</span><span class="n">frac</span><span class="p">{</span><span class="n">M_x</span><span class="p">}{</span><span class="n">L</span><span class="p">}</span> <span class="o">+</span> <span class="err">\</span><span class="n">sigma</span>  <span class="o">+</span> <span class="p">{</span><span class="n">E_x</span><span class="p">}</span> <span class="o">-</span> <span class="n">B</span><span class="p">}</span> <span class="err">\</span><span class="n">right</span><span class="p">)</span><span class="err">\</span>\
+ <span class="err">\</span><span class="n">Rightarrow</span> <span class="err">\</span><span class="n">frac</span><span class="p">{</span><span class="n">M_y</span><span class="p">}{</span><span class="n">L</span><span class="p">}</span> <span class="o">+</span> <span class="p">{</span><span class="n">E_y</span><span class="p">}</span> <span class="err">\</span><span class="n">approx</span>  <span class="o">-</span> <span class="err">\</span><span class="n">frac</span><span class="p">{</span><span class="mi">1</span><span class="p">}{</span><span class="mi">2</span><span class="p">}</span><span class="err">\</span><span class="n">left</span><span class="p">(</span> <span class="p">{</span><span class="err">\</span><span class="n">frac</span><span class="p">{</span><span class="n">M_x</span><span class="p">}{</span><span class="n">L</span><span class="p">}</span> <span class="o">+</span> <span class="p">{</span><span class="n">E_x</span><span class="p">}}</span> <span class="err">\</span><span class="n">right</span><span class="p">)</span> <span class="o">-</span> <span class="err">\</span><span class="n">frac</span><span class="p">{</span><span class="mi">3</span><span class="p">}{</span><span class="mi">2</span><span class="p">}</span><span class="err">\</span><span class="n">left</span><span class="p">(</span> <span class="p">{</span><span class="err">\</span><span class="n">sigma</span>  <span class="o">-</span> <span class="n">B</span><span class="p">}</span> <span class="err">\</span><span class="n">right</span><span class="p">)</span><span class="err">\</span>\
+ <span class="err">\</span><span class="n">Rightarrow</span> <span class="p">{</span><span class="n">M_y</span><span class="p">}</span> <span class="o">+</span> <span class="n">L</span><span class="p">{</span><span class="n">E_y</span><span class="p">}</span> <span class="err">\</span><span class="n">approx</span> <span class="err">\</span><span class="n">frac</span><span class="p">{</span><span class="mi">3</span><span class="p">}{</span><span class="mi">2</span><span class="p">}</span><span class="n">L</span><span class="err">\</span><span class="n">left</span><span class="p">(</span> <span class="p">{</span><span class="n">B</span> <span class="o">-</span> <span class="err">\</span><span class="n">sigma</span><span class="p">}</span> <span class="err">\</span><span class="n">right</span><span class="p">)</span> <span class="o">-</span> <span class="err">\</span><span class="n">frac</span><span class="p">{</span><span class="mi">1</span><span class="p">}{</span><span class="mi">2</span><span class="p">}</span><span class="err">\</span><span class="n">left</span><span class="p">(</span> <span class="p">{</span><span class="n">M_x</span><span class="p">}</span> <span class="o">+</span> <span class="n">L</span><span class="p">{</span><span class="n">E_x</span><span class="p">}</span> <span class="err">\</span><span class="n">right</span><span class="p">)</span>
+<span class="err">\</span><span class="n">end</span><span class="p">{</span><span class="n">array</span><span class="p">}</span>
+<span class="err">$$</span>
+
+
+<span class="err">由此可得</span> <span class="err">$$</span> <span class="p">{</span><span class="n">I_y</span><span class="p">}</span> <span class="o">=</span> <span class="n">R</span> <span class="o">-</span> <span class="err">\</span><span class="n">frac</span><span class="p">{</span><span class="mi">1</span><span class="p">}{</span><span class="mi">2</span><span class="p">}{</span><span class="n">I_x</span><span class="p">}</span> <span class="err">$$，此处$$</span><span class="n">R</span> <span class="o">=</span> <span class="err">\</span><span class="n">frac</span><span class="p">{</span><span class="mi">3</span><span class="p">}{</span><span class="mi">2</span><span class="p">}</span><span class="err">\</span><span class="n">left</span><span class="p">(</span> <span class="p">{</span><span class="n">B</span> <span class="o">-</span> <span class="err">\</span><span class="n">sigma</span> <span class="p">}</span> <span class="err">\</span><span class="n">right</span><span class="p">)</span><span class="n">L</span><span class="err">$$。</span>
+
+<span class="err">方程</span>
+
+<span class="err">$$</span>
+<span class="n">y_</span><span class="p">{</span><span class="mi">0</span><span class="p">}</span> <span class="o">=</span> <span class="p">{</span><span class="n">I_y</span><span class="p">}</span> <span class="o">=</span> <span class="n">R</span> <span class="o">-</span> <span class="err">\</span><span class="n">frac</span><span class="p">{</span><span class="mi">1</span><span class="p">}{</span><span class="mi">2</span><span class="p">}{</span><span class="n">I_x</span><span class="p">}</span> <span class="err">\</span><span class="n">label</span><span class="p">{</span><span class="n">ref1</span><span class="p">}</span>
+<span class="err">$$</span>
+
+<span class="err">刚好对应魔幻代码</span>
+</pre></div>

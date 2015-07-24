@@ -1,0 +1,77 @@
+<div class="highlight"><pre><span class="k">typedef</span> <span class="kt">int</span> <span class="n">word</span><span class="p">;</span>       <span class="cm">/* &quot;word&quot; used for optimal copy speed */</span>
+
+<span class="cp">#define wsize   sizeof(word)</span>
+<span class="cp">#define wmask   (wsize - 1)</span>
+
+<span class="cm">/*</span>
+<span class="cm"> * Copy a block of memory, handling overlap.</span>
+<span class="cm"> * This is the routine that actually implements</span>
+<span class="cm"> * (the portable versions of) bcopy, memcpy, and memmove.</span>
+<span class="cm"> */</span>
+
+<span class="n">__private_extern__</span>
+<span class="kt">void</span> <span class="o">*</span> <span class="nf">memcpy</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">dst0</span><span class="p">,</span> <span class="k">const</span> <span class="kt">void</span> <span class="o">*</span><span class="n">src0</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">length</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">char</span> <span class="o">*</span><span class="n">dst</span> <span class="o">=</span> <span class="n">dst0</span><span class="p">;</span>
+    <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">src</span> <span class="o">=</span> <span class="n">src0</span><span class="p">;</span>
+    <span class="kt">size_t</span> <span class="n">t</span><span class="p">;</span>
+    
+    <span class="k">if</span> <span class="p">(</span><span class="n">length</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">dst</span> <span class="o">==</span> <span class="n">src</span><span class="p">)</span>      <span class="cm">/* nothing to do */</span>
+        <span class="k">goto</span> <span class="n">done</span><span class="p">;</span>
+    
+    <span class="cm">/*</span>
+<span class="cm">     * Macros: loop-t-times; and loop-t-times, t&gt;0</span>
+<span class="cm">     */</span>
+<span class="cp">#define TLOOP(s) if (t) TLOOP1(s)</span>
+<span class="cp">#define TLOOP1(s) do { s; } while (--t)</span>
+    
+    <span class="k">if</span> <span class="p">((</span><span class="kt">unsigned</span> <span class="kt">long</span><span class="p">)</span><span class="n">dst</span> <span class="o">&lt;</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">long</span><span class="p">)</span><span class="n">src</span><span class="p">)</span> <span class="p">{</span>
+        <span class="cm">/*</span>
+<span class="cm">         * Copy forward.</span>
+<span class="cm">         */</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="p">(</span><span class="kt">uintptr_t</span><span class="p">)</span><span class="n">src</span><span class="p">;</span> <span class="cm">/* only need low bits */</span>
+        <span class="k">if</span> <span class="p">((</span><span class="n">t</span> <span class="o">|</span> <span class="p">(</span><span class="kt">uintptr_t</span><span class="p">)</span><span class="n">dst</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">wmask</span><span class="p">)</span> <span class="p">{</span>
+            <span class="cm">/*</span>
+<span class="cm">             * Try to align operands.  This cannot be done</span>
+<span class="cm">             * unless the low bits match.</span>
+<span class="cm">             */</span>
+            <span class="k">if</span> <span class="p">((</span><span class="n">t</span> <span class="o">^</span> <span class="p">(</span><span class="kt">uintptr_t</span><span class="p">)</span><span class="n">dst</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">wmask</span> <span class="o">||</span> <span class="n">length</span> <span class="o">&lt;</span> <span class="n">wsize</span><span class="p">)</span>
+                <span class="n">t</span> <span class="o">=</span> <span class="n">length</span><span class="p">;</span>
+            <span class="k">else</span>
+                <span class="n">t</span> <span class="o">=</span> <span class="n">wsize</span> <span class="o">-</span> <span class="p">(</span><span class="n">t</span> <span class="o">&amp;</span> <span class="n">wmask</span><span class="p">);</span>
+            <span class="n">length</span> <span class="o">-=</span> <span class="n">t</span><span class="p">;</span>
+            <span class="n">TLOOP1</span><span class="p">(</span><span class="o">*</span><span class="n">dst</span><span class="o">++</span> <span class="o">=</span> <span class="o">*</span><span class="n">src</span><span class="o">++</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="cm">/*</span>
+<span class="cm">         * Copy whole words, then mop up any trailing bytes.</span>
+<span class="cm">         */</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">length</span> <span class="o">/</span> <span class="n">wsize</span><span class="p">;</span>
+        <span class="n">TLOOP</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">word</span> <span class="o">*</span><span class="p">)</span><span class="n">dst</span> <span class="o">=</span> <span class="o">*</span><span class="p">(</span><span class="n">word</span> <span class="o">*</span><span class="p">)</span><span class="n">src</span><span class="p">;</span> <span class="n">src</span> <span class="o">+=</span> <span class="n">wsize</span><span class="p">;</span> <span class="n">dst</span> <span class="o">+=</span> <span class="n">wsize</span><span class="p">);</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">length</span> <span class="o">&amp;</span> <span class="n">wmask</span><span class="p">;</span>
+        <span class="n">TLOOP</span><span class="p">(</span><span class="o">*</span><span class="n">dst</span><span class="o">++</span> <span class="o">=</span> <span class="o">*</span><span class="n">src</span><span class="o">++</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="cm">/*</span>
+<span class="cm">         * Copy backwards.  Otherwise essentially the same.</span>
+<span class="cm">         * Alignment works as before, except that it takes</span>
+<span class="cm">         * (t&amp;wmask) bytes to align, not wsize-(t&amp;wmask).</span>
+<span class="cm">         */</span>
+        <span class="n">src</span> <span class="o">+=</span> <span class="n">length</span><span class="p">;</span>
+        <span class="n">dst</span> <span class="o">+=</span> <span class="n">length</span><span class="p">;</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="p">(</span><span class="kt">uintptr_t</span><span class="p">)</span><span class="n">src</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">((</span><span class="n">t</span> <span class="o">|</span> <span class="p">(</span><span class="kt">uintptr_t</span><span class="p">)</span><span class="n">dst</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">wmask</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">((</span><span class="n">t</span> <span class="o">^</span> <span class="p">(</span><span class="kt">uintptr_t</span><span class="p">)</span><span class="n">dst</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">wmask</span> <span class="o">||</span> <span class="n">length</span> <span class="o">&lt;=</span> <span class="n">wsize</span><span class="p">)</span>
+                <span class="n">t</span> <span class="o">=</span> <span class="n">length</span><span class="p">;</span>
+            <span class="k">else</span>
+                <span class="n">t</span> <span class="o">&amp;=</span> <span class="n">wmask</span><span class="p">;</span>
+            <span class="n">length</span> <span class="o">-=</span> <span class="n">t</span><span class="p">;</span>
+            <span class="n">TLOOP1</span><span class="p">(</span><span class="o">*--</span><span class="n">dst</span> <span class="o">=</span> <span class="o">*--</span><span class="n">src</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">length</span> <span class="o">/</span> <span class="n">wsize</span><span class="p">;</span>
+        <span class="n">TLOOP</span><span class="p">(</span><span class="n">src</span> <span class="o">-=</span> <span class="n">wsize</span><span class="p">;</span> <span class="n">dst</span> <span class="o">-=</span> <span class="n">wsize</span><span class="p">;</span> <span class="o">*</span><span class="p">(</span><span class="n">word</span> <span class="o">*</span><span class="p">)</span><span class="n">dst</span> <span class="o">=</span> <span class="o">*</span><span class="p">(</span><span class="n">word</span> <span class="o">*</span><span class="p">)</span><span class="n">src</span><span class="p">);</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">length</span> <span class="o">&amp;</span> <span class="n">wmask</span><span class="p">;</span>
+        <span class="n">TLOOP</span><span class="p">(</span><span class="o">*--</span><span class="n">dst</span> <span class="o">=</span> <span class="o">*--</span><span class="n">src</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="nl">done:</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">dst0</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
